@@ -1,0 +1,22 @@
+{
+  "name": "moneybook",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "react-native-worklets": "~0.7.0"
+    }
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": { "node": ">=20" }
+}
