@@ -4,79 +4,58 @@
 // Font: Nunito (amounts), system-ui (labels)
 // Accent: #b5693a (terracotta)
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import type { Transaction, Category } from '@moneybook/core';
 
-const SAMPLE = [
-  {
-    id: '1',
-    date: '2026-04-22',
-    type: 'expense',
-    icon: '🍜',
-    category: '餐饮',
-    amount: 38.5,
-    note: '午饭',
-  },
-  {
-    id: '2',
-    date: '2026-04-22',
-    type: 'expense',
-    icon: '🚇',
-    category: '交通',
-    amount: 6,
-    note: '',
-  },
-  {
-    id: '3',
-    date: '2026-04-22',
-    type: 'income',
-    icon: '💰',
-    category: '薪资',
-    amount: 12000,
-    note: '四月工资',
-  },
-  {
-    id: '4',
-    date: '2026-04-21',
-    type: 'expense',
-    icon: '🛍️',
-    category: '购物',
-    amount: 299,
-    note: 'T恤',
-  },
-  {
-    id: '5',
-    date: '2026-04-21',
-    type: 'expense',
-    icon: '☕',
-    category: '餐饮',
-    amount: 32,
-    note: '下午茶',
-  },
-  {
-    id: '6',
-    date: '2026-04-20',
-    type: 'expense',
-    icon: '🏠',
-    category: '住房',
-    amount: 3500,
-    note: '四月房租',
-  },
-  {
-    id: '7',
-    date: '2026-04-20',
-    type: 'income',
-    icon: '💵',
-    category: '其他',
-    amount: 500,
-    note: '朋友还款',
-  },
-];
+const NUNITO = "'Nunito', 'Helvetica Neue', sans-serif";
+const TERRA = '#b5693a';
+const GREEN = '#2d7a4f';
+const RED = '#b5402a';
+const CANVAS = '#f5f0e8';
 
-type SampleItem = (typeof SAMPLE)[number];
-type Grouped = [string, SampleItem[]][];
+type EnrichedTransaction = {
+  id: string;
+  date: string; // 'YYYY-MM-DD'
+  type: 'income' | 'expense';
+  icon: string;
+  category: string;
+  amount: number;
+  note: string;
+};
 
-function groupByDate(items: SampleItem[]): Grouped {
-  const map = new Map<string, SampleItem[]>();
+type Grouped = [string, EnrichedTransaction[]][];
+
+function currentMonthRange() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  return {
+    dateFrom: `${y}-${m}-01`,
+    dateTo: `${y}-${m}-31`,
+    label: `${y}年${now.getMonth() + 1}月`,
+  };
+}
+
+function enrich(transactions: Transaction[], categories: Category[]): EnrichedTransaction[] {
+  const catMap = new Map(categories.map((c) => [c.id, c]));
+  return transactions.map((t) => {
+    const cat = catMap.get(t.categoryId);
+    return {
+      id: t.id,
+      date: t.date.slice(0, 10),
+      type: t.type,
+      icon: cat?.icon ?? '📝',
+      category: cat?.name ?? '其他',
+      amount: t.amount,
+      note: t.note ?? '',
+    };
+  });
+}
+
+function groupByDate(items: EnrichedTransaction[]): Grouped {
+  const map = new Map<string, EnrichedTransaction[]>();
   for (const t of items) {
     if (!map.has(t.date)) map.set(t.date, []);
     map.get(t.date)!.push(t);
@@ -96,20 +75,14 @@ function formatDate(d: string) {
   return `${date.getMonth() + 1}月${date.getDate()}日`;
 }
 
-const NUNITO = "'Nunito', 'Helvetica Neue', sans-serif";
-const TERRA = '#b5693a';
-const GREEN = '#2d7a4f';
-const RED = '#b5402a';
-const CANVAS = '#f5f0e8';
-
-function getCatBreakdown(items: SampleItem[]) {
+function getCatBreakdown(items: EnrichedTransaction[], totalExpense: number) {
   const map = new Map<string, number>();
   items
     .filter((t) => t.type === 'expense')
     .forEach((t) => {
       map.set(t.category, (map.get(t.category) ?? 0) + t.amount);
     });
-  return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+  return { topCats: [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5), totalExpense };
 }
 
 function Avatar({ size = 32 }: { size?: number }) {
@@ -128,9 +101,12 @@ interface SidebarProps {
   totalIncome: number;
   totalExpense: number;
   topCats: [string, number][];
+  monthLabel: string;
+  onGoToMe: () => void;
+  onAdd: () => void;
 }
 
-function Sidebar({ net, totalIncome, totalExpense, topCats }: SidebarProps) {
+function Sidebar({ net, totalIncome, totalExpense, topCats, monthLabel, onGoToMe, onAdd }: SidebarProps) {
   return (
     <div className="flex flex-col p-5 h-full gap-5">
       <div className="flex items-center gap-2 pt-1">
@@ -140,7 +116,7 @@ function Sidebar({ net, totalIncome, totalExpense, topCats }: SidebarProps) {
 
       <div>
         <p className="text-xs font-semibold tracking-widest uppercase text-stone-400 mb-3">
-          2026年4月
+          {monthLabel}
         </p>
         <p className="text-xs text-stone-400 mb-0.5">本月结余</p>
         <p
@@ -197,18 +173,22 @@ function Sidebar({ net, totalIncome, totalExpense, topCats }: SidebarProps) {
                   style={{
                     background: TERRA,
                     opacity: 0.6,
-                    width: `${Math.min(100, (amount / totalExpense) * 100)}%`,
+                    width: `${totalExpense > 0 ? Math.min(100, (amount / totalExpense) * 100) : 0}%`,
                   }}
                 />
               </div>
             </div>
           ))}
+          {topCats.length === 0 && (
+            <p className="text-xs text-stone-300">暂无支出记录</p>
+          )}
         </div>
       </div>
 
       <div className="flex-1" />
 
       <button
+        onClick={onGoToMe}
         className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-stone-50 active:scale-95 w-full text-left"
         style={{ border: '1px solid #f0ebe3', touchAction: 'manipulation' }}
       >
@@ -221,6 +201,7 @@ function Sidebar({ net, totalIncome, totalExpense, topCats }: SidebarProps) {
       </button>
 
       <button
+        onClick={onAdd}
         className="w-full text-sm font-semibold py-2.5 rounded-xl text-white transition-all hover:opacity-90 active:scale-95"
         style={{ background: TERRA, touchAction: 'manipulation' }}
       >
@@ -233,9 +214,19 @@ function Sidebar({ net, totalIncome, totalExpense, topCats }: SidebarProps) {
 interface TransactionListProps {
   grouped: Grouped;
   isEmpty: boolean;
+  isLoading: boolean;
+  onDelete: (id: string) => void;
 }
 
-function TransactionList({ grouped, isEmpty }: TransactionListProps) {
+function TransactionList({ grouped, isEmpty, isLoading, onDelete }: TransactionListProps) {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-24 text-stone-300">
+        <div className="text-sm">加载中…</div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="grid gap-4 items-start"
@@ -293,6 +284,7 @@ function TransactionList({ grouped, isEmpty }: TransactionListProps) {
                 </p>
                 <button
                   aria-label="删除"
+                  onClick={() => onDelete(t.id)}
                   className="opacity-0 group-hover:opacity-100 text-stone-300 hover:text-red-400 transition-opacity w-6 h-6 flex items-center justify-center text-base"
                   style={{ touchAction: 'manipulation' }}
                 >
@@ -303,7 +295,7 @@ function TransactionList({ grouped, isEmpty }: TransactionListProps) {
           </div>
         );
       })}
-      {isEmpty && (
+      {isEmpty && !isLoading && (
         <div className="text-center py-24 text-stone-300">
           <div className="text-4xl mb-3">📒</div>
           <p className="text-sm">没有找到相关记录</p>
@@ -314,16 +306,59 @@ function TransactionList({ grouped, isEmpty }: TransactionListProps) {
 }
 
 export default function PocE() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
 
-  const filtered = SAMPLE.filter(
-    (t) => !search || t.note.includes(search) || t.category.includes(search)
+  const { dateFrom, dateTo, label: monthLabel } = useMemo(() => currentMonthRange(), []);
+
+  const { data: rawTransactions = [], isLoading: txLoading } = useQuery<Transaction[]>({
+    queryKey: ['transactions', dateFrom, dateTo],
+    queryFn: () =>
+      fetch(`/api/transactions?dateFrom=${dateFrom}&dateTo=${dateTo}`).then((r) => r.json()),
+  });
+
+  const { data: categories = [] } = useQuery<Category[]>({
+    queryKey: ['categories'],
+    queryFn: () => fetch('/api/categories').then((r) => r.json()),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) =>
+      fetch('/api/transactions', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['transactions'] }),
+  });
+
+  const enriched = useMemo(() => enrich(rawTransactions, categories), [rawTransactions, categories]);
+
+  const filtered = useMemo(
+    () => enriched.filter((t) => !search || t.note.includes(search) || t.category.includes(search)),
+    [enriched, search]
   );
-  const grouped = groupByDate(filtered);
-  const totalIncome = SAMPLE.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-  const totalExpense = SAMPLE.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+
+  const grouped = useMemo(() => groupByDate(filtered), [filtered]);
+
+  const totalIncome = useMemo(
+    () => enriched.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0),
+    [enriched]
+  );
+  const totalExpense = useMemo(
+    () => enriched.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0),
+    [enriched]
+  );
   const net = totalIncome - totalExpense;
-  const topCats = getCatBreakdown(SAMPLE);
+  const topCats = useMemo(
+    () => getCatBreakdown(enriched, totalExpense).topCats,
+    [enriched, totalExpense]
+  );
+
+  const handleDelete = (id: string) => deleteMutation.mutate(id);
+  const handleAdd = () => router.push('/add');
+  const handleGoToMe = () => router.push('/me');
 
   return (
     <div
@@ -347,6 +382,9 @@ export default function PocE() {
             totalIncome={totalIncome}
             totalExpense={totalExpense}
             topCats={topCats}
+            monthLabel={monthLabel}
+            onGoToMe={handleGoToMe}
+            onAdd={handleAdd}
           />
         </div>
 
@@ -429,7 +467,12 @@ export default function PocE() {
 
           {/* List */}
           <div className="px-5 lg:px-6 py-5 pb-28 lg:pb-8">
-            <TransactionList grouped={grouped} isEmpty={filtered.length === 0} />
+            <TransactionList
+              grouped={grouped}
+              isEmpty={filtered.length === 0}
+              isLoading={txLoading}
+              onDelete={handleDelete}
+            />
           </div>
         </div>
       </div>
@@ -467,6 +510,7 @@ export default function PocE() {
 
         <div className="flex-1 flex items-center justify-center" style={{ marginTop: -20 }}>
           <button
+            onClick={handleAdd}
             className="w-14 h-14 rounded-full flex items-center justify-center text-white text-2xl font-light shadow-lg active:scale-95 transition-all"
             style={{
               background: TERRA,
@@ -480,6 +524,7 @@ export default function PocE() {
         </div>
 
         <button
+          onClick={handleGoToMe}
           className="flex-1 flex flex-col items-center justify-center py-3 gap-1 active:scale-95 transition-all"
           style={{ color: '#b0a090', touchAction: 'manipulation' }}
         >
