@@ -6,7 +6,7 @@ import { Transaction } from '../models/transaction';
 export class RecurringService {
   constructor(
     private readonly recurringRepo: IRecurringRepository,
-    private readonly transactionRepo: ITransactionRepository,
+    private readonly transactionRepo: ITransactionRepository
   ) {}
 
   /**
@@ -14,7 +14,9 @@ export class RecurringService {
    * Call this on app startup.
    * Returns the list of newly generated transactions.
    */
-  async generateDueTransactions(today: string = new Date().toISOString().slice(0, 10)): Promise<Transaction[]> {
+  async generateDueTransactions(
+    today: string = new Date().toISOString().slice(0, 10)
+  ): Promise<Transaction[]> {
     const recurring = await this.recurringRepo.findEnabled();
     const generated: Transaction[] = [];
 
@@ -45,9 +47,7 @@ export class RecurringService {
    */
   getDueDates(r: RecurringTransaction, today: string): string[] {
     const dates: string[] = [];
-    const startFrom = r.lastGeneratedDate
-      ? this.nextDay(r.lastGeneratedDate)
-      : r.startDate;
+    const startFrom = r.lastGeneratedDate ? this.nextDay(r.lastGeneratedDate) : r.startDate;
 
     const endLimit = r.endDate && r.endDate < today ? r.endDate : today;
     if (startFrom > endLimit) return dates;
@@ -73,7 +73,9 @@ export class RecurringService {
         return date.getUTCDay() === (r.dayOfWeek ?? 0);
       case 'monthly': {
         const dayOfMonth = r.dayOfMonth ?? 1;
-        const lastDayOfMonth = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
+        const lastDayOfMonth = new Date(
+          Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)
+        ).getUTCDate();
         // If dayOfMonth > last day of month, use last day
         const targetDay = Math.min(dayOfMonth, lastDayOfMonth);
         return date.getUTCDate() === targetDay;

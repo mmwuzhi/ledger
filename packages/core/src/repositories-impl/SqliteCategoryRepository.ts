@@ -3,7 +3,9 @@ import { randomUUID } from 'expo-crypto';
 import { Category, CreateCategoryInput, UpdateCategoryInput } from '../models';
 import { ICategoryRepository } from '../repositories';
 
-function now(): string { return new Date().toISOString(); }
+function now(): string {
+  return new Date().toISOString();
+}
 
 function rowToCategory(row: Record<string, unknown>): Category {
   return {
@@ -30,7 +32,8 @@ export class SqliteCategoryRepository implements ICategoryRepository {
 
   async findById(id: string): Promise<Category | null> {
     const row = await this.db.getFirstAsync<Record<string, unknown>>(
-      'SELECT * FROM categories WHERE id = ?', [id]
+      'SELECT * FROM categories WHERE id = ?',
+      [id]
     );
     return row ? rowToCategory(row) : null;
   }
@@ -48,22 +51,30 @@ export class SqliteCategoryRepository implements ICategoryRepository {
   async update(id: string, input: UpdateCategoryInput): Promise<Category> {
     const fields: string[] = [];
     const values: unknown[] = [];
-    if (input.name !== undefined) { fields.push('name = ?'); values.push(input.name); }
-    if (input.icon !== undefined) { fields.push('icon = ?'); values.push(input.icon); }
-    if (input.type !== undefined) { fields.push('type = ?'); values.push(input.type); }
+    if (input.name !== undefined) {
+      fields.push('name = ?');
+      values.push(input.name);
+    }
+    if (input.icon !== undefined) {
+      fields.push('icon = ?');
+      values.push(input.icon);
+    }
+    if (input.type !== undefined) {
+      fields.push('type = ?');
+      values.push(input.type);
+    }
     fields.push('updated_at = ?');
     values.push(now());
     values.push(id);
-    await this.db.runAsync(
-      `UPDATE categories SET ${fields.join(', ')} WHERE id = ?`, values
-    );
+    await this.db.runAsync(`UPDATE categories SET ${fields.join(', ')} WHERE id = ?`, values);
     return (await this.findById(id))!;
   }
 
   async softDelete(id: string): Promise<void> {
-    await this.db.runAsync(
-      'UPDATE categories SET deleted_at = ?, updated_at = ? WHERE id = ?',
-      [now(), now(), id]
-    );
+    await this.db.runAsync('UPDATE categories SET deleted_at = ?, updated_at = ? WHERE id = ?', [
+      now(),
+      now(),
+      id,
+    ]);
   }
 }

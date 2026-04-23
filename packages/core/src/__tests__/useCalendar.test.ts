@@ -1,21 +1,23 @@
 import { Transaction } from '../models';
 import { computeCalendarMonth } from '../hooks/useCalendar';
 
-const makeTransaction = (overrides: Partial<Transaction>): Transaction => ({
-  id: 'txn-1',
-  type: 'expense',
-  amount: 100,
-  categoryId: 'cat-1',
-  note: '',
-  date: '2024-01-15T12:00:00.000Z',
-  receiptId: null,
-  recurringId: null,
-  bookId: 'default',
-  createdAt: '2024-01-15T12:00:00.000Z',
-  updatedAt: '2024-01-15T12:00:00.000Z',
-  deletedAt: null,
-  ...overrides,
-} as Transaction);
+const makeTransaction = (overrides: Partial<Transaction>): Transaction =>
+  ({
+    id: 'txn-1',
+    type: 'expense',
+    amount: 100,
+    categoryId: 'cat-1',
+    note: '',
+    date: '2024-01-15T12:00:00.000Z',
+    receiptId: null,
+    recurringId: null,
+    bookId: 'default',
+    currency: 'CNY',
+    createdAt: '2024-01-15T12:00:00.000Z',
+    updatedAt: '2024-01-15T12:00:00.000Z',
+    deletedAt: null,
+    ...overrides,
+  }) as Transaction;
 
 describe('computeCalendarMonth', () => {
   it('returns all zeros for empty transactions', () => {
@@ -29,9 +31,24 @@ describe('computeCalendarMonth', () => {
 
   it('aggregates mixed income and expense on the same day', () => {
     const transactions = [
-      makeTransaction({ id: 'txn-1', type: 'income', amount: 5000, date: '2024-01-15T10:00:00.000Z' }),
-      makeTransaction({ id: 'txn-2', type: 'expense', amount: 200, date: '2024-01-15T14:00:00.000Z' }),
-      makeTransaction({ id: 'txn-3', type: 'expense', amount: 300, date: '2024-01-15T18:00:00.000Z' }),
+      makeTransaction({
+        id: 'txn-1',
+        type: 'income',
+        amount: 5000,
+        date: '2024-01-15T10:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-2',
+        type: 'expense',
+        amount: 200,
+        date: '2024-01-15T14:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-3',
+        type: 'expense',
+        amount: 300,
+        date: '2024-01-15T18:00:00.000Z',
+      }),
     ];
 
     const result = computeCalendarMonth(transactions, 2024, 1);
@@ -44,9 +61,24 @@ describe('computeCalendarMonth', () => {
 
   it('separates transactions on different days correctly', () => {
     const transactions = [
-      makeTransaction({ id: 'txn-1', type: 'expense', amount: 100, date: '2024-01-10T12:00:00.000Z' }),
-      makeTransaction({ id: 'txn-2', type: 'expense', amount: 200, date: '2024-01-20T12:00:00.000Z' }),
-      makeTransaction({ id: 'txn-3', type: 'income', amount: 500, date: '2024-01-10T08:00:00.000Z' }),
+      makeTransaction({
+        id: 'txn-1',
+        type: 'expense',
+        amount: 100,
+        date: '2024-01-10T12:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-2',
+        type: 'expense',
+        amount: 200,
+        date: '2024-01-20T12:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-3',
+        type: 'income',
+        amount: 500,
+        date: '2024-01-10T08:00:00.000Z',
+      }),
     ];
 
     const result = computeCalendarMonth(transactions, 2024, 1);
@@ -62,10 +94,30 @@ describe('computeCalendarMonth', () => {
 
   it('calculates correct per-day breakdown for multiple days', () => {
     const transactions = [
-      makeTransaction({ id: 'txn-1', type: 'expense', amount: 50, date: '2024-01-05T09:00:00.000Z' }),
-      makeTransaction({ id: 'txn-2', type: 'income', amount: 1000, date: '2024-01-05T12:00:00.000Z' }),
-      makeTransaction({ id: 'txn-3', type: 'expense', amount: 80, date: '2024-01-15T12:00:00.000Z' }),
-      makeTransaction({ id: 'txn-4', type: 'income', amount: 300, date: '2024-01-25T12:00:00.000Z' }),
+      makeTransaction({
+        id: 'txn-1',
+        type: 'expense',
+        amount: 50,
+        date: '2024-01-05T09:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-2',
+        type: 'income',
+        amount: 1000,
+        date: '2024-01-05T12:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-3',
+        type: 'expense',
+        amount: 80,
+        date: '2024-01-15T12:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-4',
+        type: 'income',
+        amount: 300,
+        date: '2024-01-25T12:00:00.000Z',
+      }),
     ];
 
     const result = computeCalendarMonth(transactions, 2024, 1);
@@ -78,11 +130,36 @@ describe('computeCalendarMonth', () => {
 
   it('month totals match sum of all day totals', () => {
     const transactions = [
-      makeTransaction({ id: 'txn-1', type: 'income', amount: 1000, date: '2024-03-01T12:00:00.000Z' }),
-      makeTransaction({ id: 'txn-2', type: 'expense', amount: 250, date: '2024-03-01T12:00:00.000Z' }),
-      makeTransaction({ id: 'txn-3', type: 'income', amount: 500, date: '2024-03-15T12:00:00.000Z' }),
-      makeTransaction({ id: 'txn-4', type: 'expense', amount: 100, date: '2024-03-15T12:00:00.000Z' }),
-      makeTransaction({ id: 'txn-5', type: 'expense', amount: 75, date: '2024-03-28T12:00:00.000Z' }),
+      makeTransaction({
+        id: 'txn-1',
+        type: 'income',
+        amount: 1000,
+        date: '2024-03-01T12:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-2',
+        type: 'expense',
+        amount: 250,
+        date: '2024-03-01T12:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-3',
+        type: 'income',
+        amount: 500,
+        date: '2024-03-15T12:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-4',
+        type: 'expense',
+        amount: 100,
+        date: '2024-03-15T12:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-5',
+        type: 'expense',
+        amount: 75,
+        date: '2024-03-28T12:00:00.000Z',
+      }),
     ];
 
     const result = computeCalendarMonth(transactions, 2024, 3);
@@ -112,9 +189,27 @@ describe('computeCalendarMonth', () => {
 
   it('filters by bookId when provided', () => {
     const transactions = [
-      makeTransaction({ id: 'txn-1', type: 'expense', amount: 100, date: '2024-01-15T12:00:00.000Z', bookId: 'book-a' } as any),
-      makeTransaction({ id: 'txn-2', type: 'expense', amount: 200, date: '2024-01-15T12:00:00.000Z', bookId: 'book-b' } as any),
-      makeTransaction({ id: 'txn-3', type: 'income', amount: 500, date: '2024-01-15T12:00:00.000Z', bookId: 'book-a' } as any),
+      makeTransaction({
+        id: 'txn-1',
+        type: 'expense',
+        amount: 100,
+        date: '2024-01-15T12:00:00.000Z',
+        bookId: 'book-a',
+      } as any),
+      makeTransaction({
+        id: 'txn-2',
+        type: 'expense',
+        amount: 200,
+        date: '2024-01-15T12:00:00.000Z',
+        bookId: 'book-b',
+      } as any),
+      makeTransaction({
+        id: 'txn-3',
+        type: 'income',
+        amount: 500,
+        date: '2024-01-15T12:00:00.000Z',
+        bookId: 'book-a',
+      } as any),
     ];
 
     const result = computeCalendarMonth(transactions, 2024, 1, 'book-a');
@@ -126,8 +221,20 @@ describe('computeCalendarMonth', () => {
 
   it('includes all transactions when bookId is not provided', () => {
     const transactions = [
-      makeTransaction({ id: 'txn-1', type: 'expense', amount: 100, date: '2024-01-15T12:00:00.000Z', bookId: 'book-a' } as any),
-      makeTransaction({ id: 'txn-2', type: 'expense', amount: 200, date: '2024-01-15T12:00:00.000Z', bookId: 'book-b' } as any),
+      makeTransaction({
+        id: 'txn-1',
+        type: 'expense',
+        amount: 100,
+        date: '2024-01-15T12:00:00.000Z',
+        bookId: 'book-a',
+      } as any),
+      makeTransaction({
+        id: 'txn-2',
+        type: 'expense',
+        amount: 200,
+        date: '2024-01-15T12:00:00.000Z',
+        bookId: 'book-b',
+      } as any),
     ];
 
     const result = computeCalendarMonth(transactions, 2024, 1);

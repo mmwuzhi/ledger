@@ -25,7 +25,8 @@ export function useCreateRecurring(repo: IRecurringRepository) {
 export function useUpdateRecurring(repo: IRecurringRepository) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: UpdateRecurringInput }) => repo.update(id, input),
+    mutationFn: ({ id, input }: { id: string; input: UpdateRecurringInput }) =>
+      repo.update(id, input),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: RECURRING_KEYS.all }),
   });
 }

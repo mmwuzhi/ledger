@@ -1,4 +1,8 @@
-import { RecurringTransaction, CreateRecurringInput, UpdateRecurringInput } from '../models/recurring';
+import {
+  RecurringTransaction,
+  CreateRecurringInput,
+  UpdateRecurringInput,
+} from '../models/recurring';
 
 export interface IRecurringRepository {
   findAll(options?: { includeDeleted?: boolean }): Promise<RecurringTransaction[]>;

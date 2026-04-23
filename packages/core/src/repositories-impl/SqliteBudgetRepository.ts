@@ -30,16 +30,21 @@ export class SqliteBudgetRepository implements IBudgetRepository {
     return rows.map(rowToBudget);
   }
 
-  async findByCategoryAndMonth(categoryId: string | null, year: number, month: number): Promise<Budget | null> {
-    const row = categoryId === null
-      ? await this.db.getFirstAsync<Record<string, unknown>>(
-          'SELECT * FROM budgets WHERE category_id IS NULL AND year = ? AND month = ?',
-          [year, month]
-        )
-      : await this.db.getFirstAsync<Record<string, unknown>>(
-          'SELECT * FROM budgets WHERE category_id = ? AND year = ? AND month = ?',
-          [categoryId, year, month]
-        );
+  async findByCategoryAndMonth(
+    categoryId: string | null,
+    year: number,
+    month: number
+  ): Promise<Budget | null> {
+    const row =
+      categoryId === null
+        ? await this.db.getFirstAsync<Record<string, unknown>>(
+            'SELECT * FROM budgets WHERE category_id IS NULL AND year = ? AND month = ?',
+            [year, month]
+          )
+        : await this.db.getFirstAsync<Record<string, unknown>>(
+            'SELECT * FROM budgets WHERE category_id = ? AND year = ? AND month = ?',
+            [categoryId, year, month]
+          );
     return row ? rowToBudget(row) : null;
   }
 
@@ -55,10 +60,11 @@ export class SqliteBudgetRepository implements IBudgetRepository {
   }
 
   async update(id: string, input: UpdateBudgetInput): Promise<Budget> {
-    await this.db.runAsync(
-      'UPDATE budgets SET amount = ?, updated_at = ? WHERE id = ?',
-      [input.amount, now(), id]
-    );
+    await this.db.runAsync('UPDATE budgets SET amount = ?, updated_at = ? WHERE id = ?', [
+      input.amount,
+      now(),
+      id,
+    ]);
     return (await this.findById(id))!;
   }
 

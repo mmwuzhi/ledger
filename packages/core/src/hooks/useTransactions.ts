@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ITransactionRepository } from '../repositories/ITransactionRepository';
-import { CreateTransactionInput, UpdateTransactionInput, TransactionSearchFilters } from '../models';
+import {
+  CreateTransactionInput,
+  UpdateTransactionInput,
+  TransactionSearchFilters,
+} from '../models';
 
 export const TRANSACTION_KEYS = {
   all: ['transactions'] as const,
@@ -22,8 +26,11 @@ export function useTransaction(id: string, repo: ITransactionRepository) {
   });
 }
 
-export function useSearchTransactions(filters: TransactionSearchFilters, repo: ITransactionRepository) {
-  const hasFilters = Object.values(filters).some(v => v !== undefined && v !== '');
+export function useSearchTransactions(
+  filters: TransactionSearchFilters,
+  repo: ITransactionRepository
+) {
+  const hasFilters = Object.values(filters).some((v) => v !== undefined && v !== '');
   return useQuery({
     queryKey: TRANSACTION_KEYS.search(filters),
     queryFn: () => repo.search(filters),

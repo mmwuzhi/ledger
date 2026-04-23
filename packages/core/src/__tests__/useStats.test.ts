@@ -11,6 +11,7 @@ const makeTransaction = (overrides: Partial<Transaction>): Transaction => ({
   receiptId: null,
   recurringId: null,
   bookId: 'default',
+  currency: 'CNY',
   createdAt: '2024-01-15T12:00:00.000Z',
   updatedAt: '2024-01-15T12:00:00.000Z',
   deletedAt: null,
@@ -22,10 +23,10 @@ const makeTransaction = (overrides: Partial<Transaction>): Transaction => ({
  */
 function computeMonthlyStats(transactions: Transaction[]) {
   const totalIncome = transactions
-    .filter(t => t.type === 'income')
+    .filter((t) => t.type === 'income')
     .reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = transactions
-    .filter(t => t.type === 'expense')
+    .filter((t) => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0);
   return {
     totalIncome,
@@ -43,7 +44,7 @@ function computeOverviewStats(all: Transaction[]) {
   if (totalRecords === 0) {
     return { totalRecords: 0, daysSinceFirst: 0 };
   }
-  const dates = all.map(t => new Date(t.date).getTime());
+  const dates = all.map((t) => new Date(t.date).getTime());
   const firstDate = new Date(Math.min(...dates));
   const daysSinceFirst = Math.ceil((Date.now() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
   return { totalRecords, daysSinceFirst };
@@ -78,13 +79,28 @@ describe('Monthly stats calculation', () => {
     const to = '2024-01-31T23:59:59.999Z';
 
     const allTransactions: Transaction[] = [
-      makeTransaction({ id: 'txn-1', type: 'expense', amount: 100, date: '2024-01-15T12:00:00.000Z' }),
-      makeTransaction({ id: 'txn-2', type: 'expense', amount: 200, date: '2024-02-15T12:00:00.000Z' }),
-      makeTransaction({ id: 'txn-3', type: 'income', amount: 500, date: '2024-01-20T12:00:00.000Z' }),
+      makeTransaction({
+        id: 'txn-1',
+        type: 'expense',
+        amount: 100,
+        date: '2024-01-15T12:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-2',
+        type: 'expense',
+        amount: 200,
+        date: '2024-02-15T12:00:00.000Z',
+      }),
+      makeTransaction({
+        id: 'txn-3',
+        type: 'income',
+        amount: 500,
+        date: '2024-01-20T12:00:00.000Z',
+      }),
     ];
 
     // Simulate findByDateRange filtering
-    const filtered = allTransactions.filter(t => t.date >= from && t.date <= to);
+    const filtered = allTransactions.filter((t) => t.date >= from && t.date <= to);
     const stats = computeMonthlyStats(filtered);
 
     expect(stats.totalExpense).toBe(100);
@@ -130,8 +146,16 @@ describe('Overview stats calculation', () => {
 });
 
 const CHART_COLORS = [
-  '#6366f1', '#f43f5e', '#eab308', '#22c55e', '#3b82f6',
-  '#a855f7', '#f97316', '#14b8a6', '#ec4899', '#64748b',
+  '#6366f1',
+  '#f43f5e',
+  '#eab308',
+  '#22c55e',
+  '#3b82f6',
+  '#a855f7',
+  '#f97316',
+  '#14b8a6',
+  '#ec4899',
+  '#64748b',
 ];
 
 const makeCategory = (overrides: Partial<Category>): Category => ({
@@ -148,10 +172,10 @@ const makeCategory = (overrides: Partial<Category>): Category => ({
 function computeCategoryBreakdown(
   transactions: Transaction[],
   categories: Category[],
-  type: 'expense' | 'income',
+  type: 'expense' | 'income'
 ): CategoryBreakdown[] {
-  const categoryMap = Object.fromEntries(categories.map(c => [c.id, c]));
-  const filtered = transactions.filter(t => t.type === type);
+  const categoryMap = Object.fromEntries(categories.map((c) => [c.id, c]));
+  const filtered = transactions.filter((t) => t.type === type);
   const total = filtered.reduce((sum, t) => sum + t.amount, 0);
   if (total === 0) return [];
 
@@ -221,13 +245,11 @@ describe('Category breakdown calculation', () => {
       makeTransaction({ id: 't3', categoryId: 'cat-shopping', amount: 30 }),
     ];
     const result = computeCategoryBreakdown(transactions, categories, 'expense');
-    expect(result.map(r => r.categoryName)).toEqual(['交通', '购物', '餐饮']);
+    expect(result.map((r) => r.categoryName)).toEqual(['交通', '购物', '餐饮']);
   });
 
   it('handles unknown category gracefully', () => {
-    const transactions = [
-      makeTransaction({ id: 't1', categoryId: 'cat-unknown', amount: 100 }),
-    ];
+    const transactions = [makeTransaction({ id: 't1', categoryId: 'cat-unknown', amount: 100 })];
     const result = computeCategoryBreakdown(transactions, categories, 'expense');
     expect(result[0].categoryName).toBe('未知');
     expect(result[0].categoryIcon).toBe('📦');

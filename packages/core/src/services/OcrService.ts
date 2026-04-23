@@ -36,10 +36,7 @@ export class OcrService {
 
   private extractDate(text: string): string | null {
     // Match YYYY-MM-DD, YYYY/MM/DD, YYYY年MM月DD日
-    const patterns = [
-      /(\d{4}[-/]\d{2}[-/]\d{2})/,
-      /(\d{4})年(\d{1,2})月(\d{1,2})日/,
-    ];
+    const patterns = [/(\d{4}[-/]\d{2}[-/]\d{2})/, /(\d{4})年(\d{1,2})月(\d{1,2})日/];
     const isoPattern = text.match(patterns[0]);
     if (isoPattern) return isoPattern[1].replace(/\//g, '-');
     const cnPattern = text.match(patterns[1]);
@@ -52,7 +49,10 @@ export class OcrService {
 
   private extractNote(text: string): string {
     // Return first meaningful line as note (trim whitespace, skip short lines)
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+    const lines = text
+      .split('\n')
+      .map((l) => l.trim())
+      .filter((l) => l.length > 2);
     return lines[0] ?? '';
   }
 }

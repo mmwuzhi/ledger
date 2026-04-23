@@ -36,10 +36,10 @@ export function useMonthlyStats(repo: ITransactionRepository, year: number, mont
     queryFn: async () => {
       const transactions = await repo.findByDateRange(from, to);
       const totalIncome = transactions
-        .filter(t => t.type === 'income')
+        .filter((t) => t.type === 'income')
         .reduce((sum, t) => sum + t.amount, 0);
       const totalExpense = transactions
-        .filter(t => t.type === 'expense')
+        .filter((t) => t.type === 'expense')
         .reduce((sum, t) => sum + t.amount, 0);
       return {
         totalIncome,
@@ -52,8 +52,16 @@ export function useMonthlyStats(repo: ITransactionRepository, year: number, mont
 }
 
 const CHART_COLORS = [
-  '#6366f1', '#f43f5e', '#eab308', '#22c55e', '#3b82f6',
-  '#a855f7', '#f97316', '#14b8a6', '#ec4899', '#64748b',
+  '#6366f1',
+  '#f43f5e',
+  '#eab308',
+  '#22c55e',
+  '#3b82f6',
+  '#a855f7',
+  '#f97316',
+  '#14b8a6',
+  '#ec4899',
+  '#64748b',
 ];
 
 export function useCategoryBreakdown(
@@ -61,7 +69,7 @@ export function useCategoryBreakdown(
   categoryRepo: ICategoryRepository,
   year: number,
   month: number,
-  type: 'expense' | 'income' = 'expense',
+  type: 'expense' | 'income' = 'expense'
 ) {
   const from = `${year}-${String(month).padStart(2, '0')}-01T00:00:00.000Z`;
   const lastDay = new Date(year, month, 0).getDate();
@@ -74,8 +82,8 @@ export function useCategoryBreakdown(
         transactionRepo.findByDateRange(from, to),
         categoryRepo.findAll(),
       ]);
-      const categoryMap = Object.fromEntries(categories.map(c => [c.id, c]));
-      const filtered = transactions.filter(t => t.type === type);
+      const categoryMap = Object.fromEntries(categories.map((c) => [c.id, c]));
+      const filtered = transactions.filter((t) => t.type === type);
       const total = filtered.reduce((sum, t) => sum + t.amount, 0);
       if (total === 0) return [];
 
@@ -118,10 +126,10 @@ export function useMonthlyTrend(repo: ITransactionRepository, months: number = 6
 
         const transactions = await repo.findByDateRange(from, to);
         const income = transactions
-          .filter(t => t.type === 'income')
+          .filter((t) => t.type === 'income')
           .reduce((sum, t) => sum + t.amount, 0);
         const expense = transactions
-          .filter(t => t.type === 'expense')
+          .filter((t) => t.type === 'expense')
           .reduce((sum, t) => sum + t.amount, 0);
 
         result.push({
@@ -147,7 +155,7 @@ export function useOverviewStats(repo: ITransactionRepository) {
       if (totalRecords === 0) {
         return { totalRecords: 0, daysSinceFirst: 0 };
       }
-      const dates = all.map(t => new Date(t.date).getTime());
+      const dates = all.map((t) => new Date(t.date).getTime());
       const firstDate = new Date(Math.min(...dates));
       const daysSinceFirst = Math.ceil((Date.now() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
       return { totalRecords, daysSinceFirst };

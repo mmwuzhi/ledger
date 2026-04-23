@@ -1,4 +1,9 @@
-import { Transaction, CreateTransactionInput, UpdateTransactionInput, TransactionSearchFilters } from '../models';
+import {
+  Transaction,
+  CreateTransactionInput,
+  UpdateTransactionInput,
+  TransactionSearchFilters,
+} from '../models';
 
 export interface ITransactionRepository {
   findAll(options?: { includeDeleted?: boolean }): Promise<Transaction[]>;

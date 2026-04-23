@@ -7,7 +7,7 @@ export class TransactionService {
   constructor(
     private readonly transactionRepo: ITransactionRepository,
     private readonly categoryRepo: ICategoryRepository,
-    private readonly receiptRepo: IReceiptRepository,
+    private readonly receiptRepo: IReceiptRepository
   ) {}
 
   async createTransaction(input: CreateTransactionInput): Promise<Transaction> {

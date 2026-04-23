@@ -24,12 +24,17 @@ describe('SettingsSchema', () => {
       currency: '¥',
       defaultTransactionType: 'expense',
       currentBookId: 'default',
+      appLockEnabled: false,
+      appLockMethod: 'biometric',
+      theme: 'system',
+      reminderEnabled: false,
+      reminderTime: '21:00',
+      budgetAlertEnabled: true,
+      budgetAlertThreshold: 80,
     });
   });
 
   it('rejects invalid defaultTransactionType values', () => {
-    expect(() =>
-      SettingsSchema.parse({ defaultTransactionType: 'transfer' })
-    ).toThrow();
+    expect(() => SettingsSchema.parse({ defaultTransactionType: 'transfer' })).toThrow();
   });
 });

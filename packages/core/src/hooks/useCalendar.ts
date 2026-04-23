@@ -3,7 +3,7 @@ import { ITransactionRepository } from '../repositories/ITransactionRepository';
 import { Transaction } from '../models';
 
 export interface CalendarDayData {
-  date: string;           // 'YYYY-MM-DD'
+  date: string; // 'YYYY-MM-DD'
   totalIncome: number;
   totalExpense: number;
   transactionCount: number;
@@ -12,7 +12,7 @@ export interface CalendarDayData {
 export interface CalendarMonthData {
   year: number;
   month: number;
-  days: Record<string, CalendarDayData>;  // key is 'YYYY-MM-DD'
+  days: Record<string, CalendarDayData>; // key is 'YYYY-MM-DD'
   totalIncome: number;
   totalExpense: number;
 }
@@ -20,8 +20,7 @@ export interface CalendarMonthData {
 export const CALENDAR_KEYS = {
   month: (year: number, month: number, bookId?: string) =>
     ['calendar', year, month, bookId] as const,
-  day: (date: string, bookId?: string) =>
-    ['calendar', 'day', date, bookId] as const,
+  day: (date: string, bookId?: string) => ['calendar', 'day', date, bookId] as const,
 };
 
 /**
@@ -32,11 +31,9 @@ export function computeCalendarMonth(
   transactions: Transaction[],
   year: number,
   month: number,
-  bookId?: string,
+  bookId?: string
 ): CalendarMonthData {
-  const filtered = bookId
-    ? transactions.filter(t => (t as any).bookId === bookId)
-    : transactions;
+  const filtered = bookId ? transactions.filter((t) => (t as any).bookId === bookId) : transactions;
 
   const days: Record<string, CalendarDayData> = {};
   let totalIncome = 0;
@@ -67,7 +64,7 @@ export function useCalendarMonth(
   transactionRepo: ITransactionRepository,
   year: number,
   month: number,
-  bookId?: string,
+  bookId?: string
 ) {
   const from = `${year}-${String(month).padStart(2, '0')}-01T00:00:00.000Z`;
   const lastDay = new Date(year, month, 0).getDate();
@@ -87,8 +84,8 @@ export function useCalendarMonth(
  */
 export function useDayTransactions(
   transactionRepo: ITransactionRepository,
-  date: string,  // 'YYYY-MM-DD'
-  bookId?: string,
+  date: string, // 'YYYY-MM-DD'
+  bookId?: string
 ) {
   const from = `${date}T00:00:00.000Z`;
   const to = `${date}T23:59:59.999Z`;
@@ -97,9 +94,7 @@ export function useDayTransactions(
     queryKey: CALENDAR_KEYS.day(date, bookId),
     queryFn: async () => {
       const transactions = await transactionRepo.findByDateRange(from, to);
-      return bookId
-        ? transactions.filter(t => (t as any).bookId === bookId)
-        : transactions;
+      return bookId ? transactions.filter((t) => (t as any).bookId === bookId) : transactions;
     },
   });
 }

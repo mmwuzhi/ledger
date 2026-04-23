@@ -3,7 +3,9 @@ import { randomUUID } from 'expo-crypto';
 import { Receipt, OcrResult, CreateReceiptInput } from '../models';
 import { IReceiptRepository } from '../repositories';
 
-function now(): string { return new Date().toISOString(); }
+function now(): string {
+  return new Date().toISOString();
+}
 
 function rowToReceipt(row: Record<string, unknown>): Receipt {
   return {
@@ -21,7 +23,8 @@ export class SqliteReceiptRepository implements IReceiptRepository {
 
   async findById(id: string): Promise<Receipt | null> {
     const row = await this.db.getFirstAsync<Record<string, unknown>>(
-      'SELECT * FROM receipts WHERE id = ?', [id]
+      'SELECT * FROM receipts WHERE id = ?',
+      [id]
     );
     return row ? rowToReceipt(row) : null;
   }
@@ -37,17 +40,19 @@ export class SqliteReceiptRepository implements IReceiptRepository {
   }
 
   async updateOcrResult(id: string, ocrResult: OcrResult): Promise<Receipt> {
-    await this.db.runAsync(
-      'UPDATE receipts SET ocr_result = ?, updated_at = ? WHERE id = ?',
-      [JSON.stringify(ocrResult), now(), id]
-    );
+    await this.db.runAsync('UPDATE receipts SET ocr_result = ?, updated_at = ? WHERE id = ?', [
+      JSON.stringify(ocrResult),
+      now(),
+      id,
+    ]);
     return (await this.findById(id))!;
   }
 
   async softDelete(id: string): Promise<void> {
-    await this.db.runAsync(
-      'UPDATE receipts SET deleted_at = ?, updated_at = ? WHERE id = ?',
-      [now(), now(), id]
-    );
+    await this.db.runAsync('UPDATE receipts SET deleted_at = ?, updated_at = ? WHERE id = ?', [
+      now(),
+      now(),
+      id,
+    ]);
   }
 }

@@ -55,6 +55,35 @@ export const CREATE_TABLES_SQL = `
     receipt_id TEXT REFERENCES receipts(id),
     recurring_id TEXT REFERENCES recurring_transactions(id),
     book_id TEXT NOT NULL DEFAULT 'default' REFERENCES books(id),
+    currency TEXT NOT NULL DEFAULT 'CNY',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS tags (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    color TEXT NOT NULL DEFAULT '#6366f1',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS transaction_tags (
+    transaction_id TEXT NOT NULL REFERENCES transactions(id),
+    tag_id TEXT NOT NULL REFERENCES tags(id),
+    PRIMARY KEY (transaction_id, tag_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS quick_templates (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    type TEXT NOT NULL CHECK(type IN ('income', 'expense')),
+    amount REAL NOT NULL,
+    category_id TEXT NOT NULL REFERENCES categories(id),
+    note TEXT NOT NULL DEFAULT '',
+    currency TEXT NOT NULL DEFAULT 'CNY',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
     deleted_at TEXT
@@ -91,5 +120,8 @@ export const DEFAULT_CATEGORIES_SQL = `
     ('cat-housing',    '住房',   '🏠', 'expense', datetime('now'), datetime('now')),
     ('cat-salary',     '薪资',   '💰', 'income',  datetime('now'), datetime('now')),
     ('cat-other-exp',  '其他支出','📦', 'expense', datetime('now'), datetime('now')),
-    ('cat-other-inc',  '其他收入','💵', 'income',  datetime('now'), datetime('now'));
+    ('cat-other-inc',  '其他收入','💵', 'income',  datetime('now'), datetime('now')),
+    -- Special system categories: cannot be deleted, only toggled
+    ('cat-dai-fu',     '代付',   '🤝', 'expense', datetime('now'), datetime('now')),
+    ('cat-shou-kuan',  '收款',   '💸', 'income',  datetime('now'), datetime('now'));
 `;

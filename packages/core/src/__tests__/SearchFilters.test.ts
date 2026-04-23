@@ -11,6 +11,7 @@ const mockTransactions: Transaction[] = [
     receiptId: null,
     recurringId: null,
     bookId: 'default',
+    currency: 'CNY',
     createdAt: '2024-01-15T12:00:00.000Z',
     updatedAt: '2024-01-15T12:00:00.000Z',
     deletedAt: null,
@@ -25,6 +26,7 @@ const mockTransactions: Transaction[] = [
     receiptId: null,
     recurringId: null,
     bookId: 'default',
+    currency: 'CNY',
     createdAt: '2024-02-10T14:00:00.000Z',
     updatedAt: '2024-02-10T14:00:00.000Z',
     deletedAt: null,
@@ -39,6 +41,7 @@ const mockTransactions: Transaction[] = [
     receiptId: null,
     recurringId: null,
     bookId: 'default',
+    currency: 'CNY',
     createdAt: '2024-01-05T09:00:00.000Z',
     updatedAt: '2024-01-05T09:00:00.000Z',
     deletedAt: null,
@@ -53,6 +56,7 @@ const mockTransactions: Transaction[] = [
     receiptId: null,
     recurringId: null,
     bookId: 'default',
+    currency: 'CNY',
     createdAt: '2024-01-20T18:00:00.000Z',
     updatedAt: '2024-01-20T18:00:00.000Z',
     deletedAt: null,
@@ -60,8 +64,11 @@ const mockTransactions: Transaction[] = [
 ];
 
 // Simulate the same filtering logic as SqliteTransactionRepository.search
-function applyFilters(transactions: Transaction[], filters: TransactionSearchFilters): Transaction[] {
-  return transactions.filter(t => {
+function applyFilters(
+  transactions: Transaction[],
+  filters: TransactionSearchFilters
+): Transaction[] {
+  return transactions.filter((t) => {
     if (t.deletedAt) return false;
     if (filters.keyword && !t.note.includes(filters.keyword)) return false;
     if (filters.type && t.type !== filters.type) return false;
@@ -104,19 +111,19 @@ describe('Transaction search filters', () => {
       dateTo: '2024-01-31T23:59:59.999Z',
     });
     expect(result).toHaveLength(3);
-    expect(result.map(r => r.id).sort()).toEqual(['txn-1', 'txn-3', 'txn-4']);
+    expect(result.map((r) => r.id).sort()).toEqual(['txn-1', 'txn-3', 'txn-4']);
   });
 
   it('filters by amount range', () => {
     const result = applyFilters(mockTransactions, { amountMin: 40, amountMax: 200 });
     expect(result).toHaveLength(2);
-    expect(result.map(r => r.id).sort()).toEqual(['txn-1', 'txn-2']);
+    expect(result.map((r) => r.id).sort()).toEqual(['txn-1', 'txn-2']);
   });
 
   it('filters by amountMin only', () => {
     const result = applyFilters(mockTransactions, { amountMin: 100 });
     expect(result).toHaveLength(2);
-    expect(result.map(r => r.id).sort()).toEqual(['txn-2', 'txn-3']);
+    expect(result.map((r) => r.id).sort()).toEqual(['txn-2', 'txn-3']);
   });
 
   it('combines multiple filters', () => {
@@ -126,7 +133,7 @@ describe('Transaction search filters', () => {
       amountMax: 60,
     });
     expect(result).toHaveLength(2);
-    expect(result.map(r => r.id).sort()).toEqual(['txn-1', 'txn-4']);
+    expect(result.map((r) => r.id).sort()).toEqual(['txn-1', 'txn-4']);
   });
 
   it('returns empty when no match', () => {
@@ -135,13 +142,16 @@ describe('Transaction search filters', () => {
   });
 
   it('excludes deleted transactions', () => {
-    const withDeleted = [...mockTransactions, {
-      ...mockTransactions[0],
-      id: 'txn-deleted',
-      deletedAt: '2024-01-16T00:00:00.000Z',
-    }];
+    const withDeleted = [
+      ...mockTransactions,
+      {
+        ...mockTransactions[0],
+        id: 'txn-deleted',
+        deletedAt: '2024-01-16T00:00:00.000Z',
+      },
+    ];
     const result = applyFilters(withDeleted, {});
     expect(result).toHaveLength(4);
-    expect(result.find(t => t.id === 'txn-deleted')).toBeUndefined();
+    expect(result.find((t) => t.id === 'txn-deleted')).toBeUndefined();
   });
 });

@@ -19,7 +19,7 @@ export class SqliteBookRepository implements IBookRepository {
 
   async findAll(): Promise<Book[]> {
     const rows = await this.db.getAllAsync(
-      'SELECT * FROM books WHERE deleted_at IS NULL ORDER BY created_at ASC',
+      'SELECT * FROM books WHERE deleted_at IS NULL ORDER BY created_at ASC'
     );
     return rows.map(rowToBook);
   }
@@ -27,7 +27,7 @@ export class SqliteBookRepository implements IBookRepository {
   async findById(id: string): Promise<Book | null> {
     const row = await this.db.getFirstAsync(
       'SELECT * FROM books WHERE id = ? AND deleted_at IS NULL',
-      [id],
+      [id]
     );
     return row ? rowToBook(row) : null;
   }
@@ -37,7 +37,7 @@ export class SqliteBookRepository implements IBookRepository {
     const timestamp = new Date().toISOString();
     await this.db.runAsync(
       `INSERT INTO books (id, name, icon, created_at, updated_at) VALUES (?, ?, ?, ?, ?)`,
-      [id, input.name, input.icon, timestamp, timestamp],
+      [id, input.name, input.icon, timestamp, timestamp]
     );
     return (await this.findById(id))!;
   }
@@ -47,8 +47,14 @@ export class SqliteBookRepository implements IBookRepository {
     const fields: string[] = ['updated_at = ?'];
     const values: any[] = [timestamp];
 
-    if (input.name !== undefined) { fields.push('name = ?'); values.push(input.name); }
-    if (input.icon !== undefined) { fields.push('icon = ?'); values.push(input.icon); }
+    if (input.name !== undefined) {
+      fields.push('name = ?');
+      values.push(input.name);
+    }
+    if (input.icon !== undefined) {
+      fields.push('icon = ?');
+      values.push(input.icon);
+    }
 
     values.push(id);
     await this.db.runAsync(`UPDATE books SET ${fields.join(', ')} WHERE id = ?`, values);
@@ -57,9 +63,10 @@ export class SqliteBookRepository implements IBookRepository {
 
   async softDelete(id: string): Promise<void> {
     const timestamp = new Date().toISOString();
-    await this.db.runAsync(
-      'UPDATE books SET deleted_at = ?, updated_at = ? WHERE id = ?',
-      [timestamp, timestamp, id],
-    );
+    await this.db.runAsync('UPDATE books SET deleted_at = ?, updated_at = ? WHERE id = ?', [
+      timestamp,
+      timestamp,
+      id,
+    ]);
   }
 }

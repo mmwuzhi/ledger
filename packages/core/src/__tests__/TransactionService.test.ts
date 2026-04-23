@@ -24,12 +24,15 @@ const mockTransaction: Transaction = {
   receiptId: null,
   recurringId: null,
   bookId: 'default',
+  currency: 'CNY',
   createdAt: '2024-01-15T12:00:00.000Z',
   updatedAt: '2024-01-15T12:00:00.000Z',
   deletedAt: null,
 };
 
-function makeMockTransactionRepo(overrides?: Partial<ITransactionRepository>): ITransactionRepository {
+function makeMockTransactionRepo(
+  overrides?: Partial<ITransactionRepository>
+): ITransactionRepository {
   return {
     findAll: jest.fn().mockResolvedValue([mockTransaction]),
     findById: jest.fn().mockResolvedValue(mockTransaction),
@@ -139,7 +142,9 @@ describe('TransactionService', () => {
 
     it('also soft deletes linked receipt', async () => {
       const txnWithReceipt = { ...mockTransaction, receiptId: 'rcpt-1' };
-      const txnRepo = makeMockTransactionRepo({ findById: jest.fn().mockResolvedValue(txnWithReceipt) });
+      const txnRepo = makeMockTransactionRepo({
+        findById: jest.fn().mockResolvedValue(txnWithReceipt),
+      });
       const catRepo = makeMockCategoryRepo();
       const rcptRepo = makeMockReceiptRepo();
       const service = new TransactionService(txnRepo, catRepo, rcptRepo);

@@ -5,3 +5,5 @@ export * from './ISettingsRepository';
 export * from './IBudgetRepository';
 export * from './IRecurringRepository';
 export * from './IBookRepository';
+export * from './ITagRepository';
+export * from './IQuickTemplateRepository';

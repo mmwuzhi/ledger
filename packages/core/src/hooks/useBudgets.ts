@@ -32,7 +32,7 @@ export function useBudgetProgress(
   transactionRepo: ITransactionRepository,
   categoryRepo: ICategoryRepository,
   year: number,
-  month: number,
+  month: number
 ) {
   return useQuery({
     queryKey: BUDGET_KEYS.progress(year, month),
@@ -47,47 +47,50 @@ export function useBudgetProgress(
       const lastDay = new Date(year, month, 0).getDate();
       const to = `${year}-${String(month).padStart(2, '0')}-${lastDay}T23:59:59.999Z`;
       const transactions = await transactionRepo.findByDateRange(from, to);
-      const expenses = transactions.filter(t => t.type === 'expense');
+      const expenses = transactions.filter((t) => t.type === 'expense');
 
-      const categoryMap = Object.fromEntries(categories.map(c => [c.id, c]));
+      const categoryMap = Object.fromEntries(categories.map((c) => [c.id, c]));
 
-      return budgets.map(budget => {
-        let spentAmount: number;
-        let categoryName: string;
-        let categoryIcon: string;
+      return budgets
+        .map((budget) => {
+          let spentAmount: number;
+          let categoryName: string;
+          let categoryIcon: string;
 
-        if (budget.categoryId === null) {
-          // Overall budget
-          spentAmount = expenses.reduce((sum, t) => sum + t.amount, 0);
-          categoryName = '总预算';
-          categoryIcon = '💰';
-        } else {
-          spentAmount = expenses
-            .filter(t => t.categoryId === budget.categoryId)
-            .reduce((sum, t) => sum + t.amount, 0);
-          const cat = categoryMap[budget.categoryId];
-          categoryName = cat?.name ?? '未知';
-          categoryIcon = cat?.icon ?? '📦';
-        }
+          if (budget.categoryId === null) {
+            // Overall budget
+            spentAmount = expenses.reduce((sum, t) => sum + t.amount, 0);
+            categoryName = '总预算';
+            categoryIcon = '💰';
+          } else {
+            spentAmount = expenses
+              .filter((t) => t.categoryId === budget.categoryId)
+              .reduce((sum, t) => sum + t.amount, 0);
+            const cat = categoryMap[budget.categoryId];
+            categoryName = cat?.name ?? '未知';
+            categoryIcon = cat?.icon ?? '📦';
+          }
 
-        const percentage = budget.amount > 0 ? Math.round((spentAmount / budget.amount) * 100) : 0;
+          const percentage =
+            budget.amount > 0 ? Math.round((spentAmount / budget.amount) * 100) : 0;
 
-        return {
-          budgetId: budget.id,
-          categoryId: budget.categoryId,
-          categoryName,
-          categoryIcon,
-          budgetAmount: budget.amount,
-          spentAmount,
-          percentage,
-          isOverBudget: spentAmount > budget.amount,
-        };
-      }).sort((a, b) => {
-        // Overall budget first, then by percentage descending
-        if (a.categoryId === null) return -1;
-        if (b.categoryId === null) return 1;
-        return b.percentage - a.percentage;
-      });
+          return {
+            budgetId: budget.id,
+            categoryId: budget.categoryId,
+            categoryName,
+            categoryIcon,
+            budgetAmount: budget.amount,
+            spentAmount,
+            percentage,
+            isOverBudget: spentAmount > budget.amount,
+          };
+        })
+        .sort((a, b) => {
+          // Overall budget first, then by percentage descending
+          if (a.categoryId === null) return -1;
+          if (b.categoryId === null) return 1;
+          return b.percentage - a.percentage;
+        });
     },
   });
 }

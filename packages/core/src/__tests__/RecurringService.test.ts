@@ -35,6 +35,7 @@ const mockTransaction: Transaction = {
   receiptId: null,
   recurringId: 'rec-1',
   bookId: 'default',
+  currency: 'CNY',
   createdAt: '2024-01-01T00:00:00.000Z',
   updatedAt: '2024-01-01T00:00:00.000Z',
   deletedAt: null,
@@ -53,7 +54,9 @@ function makeMockRecurringRepo(overrides?: Partial<IRecurringRepository>): IRecu
   };
 }
 
-function makeMockTransactionRepo(overrides?: Partial<ITransactionRepository>): ITransactionRepository {
+function makeMockTransactionRepo(
+  overrides?: Partial<ITransactionRepository>
+): ITransactionRepository {
   return {
     findAll: jest.fn().mockResolvedValue([]),
     findById: jest.fn().mockResolvedValue(null),
@@ -80,13 +83,7 @@ describe('RecurringService', () => {
       });
 
       const dates = service.getDueDates(r, '2024-01-05');
-      expect(dates).toEqual([
-        '2024-01-01',
-        '2024-01-02',
-        '2024-01-03',
-        '2024-01-04',
-        '2024-01-05',
-      ]);
+      expect(dates).toEqual(['2024-01-01', '2024-01-02', '2024-01-03', '2024-01-04', '2024-01-05']);
     });
 
     it('only generates on correct day of week (weekly)', () => {
@@ -103,11 +100,7 @@ describe('RecurringService', () => {
       });
 
       const dates = service.getDueDates(r, '2024-01-15');
-      expect(dates).toEqual([
-        '2024-01-01',
-        '2024-01-08',
-        '2024-01-15',
-      ]);
+      expect(dates).toEqual(['2024-01-01', '2024-01-08', '2024-01-15']);
     });
 
     it('generates on correct day of month (monthly)', () => {
@@ -123,11 +116,7 @@ describe('RecurringService', () => {
       });
 
       const dates = service.getDueDates(r, '2024-03-20');
-      expect(dates).toEqual([
-        '2024-01-15',
-        '2024-02-15',
-        '2024-03-15',
-      ]);
+      expect(dates).toEqual(['2024-01-15', '2024-02-15', '2024-03-15']);
     });
 
     it('handles months with fewer days (e.g. Feb 28 when dayOfMonth=31)', () => {
@@ -163,13 +152,9 @@ describe('RecurringService', () => {
       });
 
       const dates = service.getDueDates(r, '2024-01-07');
-      expect(dates).toEqual([
-        '2024-01-05',
-        '2024-01-06',
-        '2024-01-07',
-      ]);
+      expect(dates).toEqual(['2024-01-05', '2024-01-06', '2024-01-07']);
       // No dates before Jan 5
-      expect(dates.find(d => d < '2024-01-05')).toBeUndefined();
+      expect(dates.find((d) => d < '2024-01-05')).toBeUndefined();
     });
 
     it('respects endDate (no dates after end)', () => {
@@ -185,11 +170,7 @@ describe('RecurringService', () => {
       });
 
       const dates = service.getDueDates(r, '2024-01-10');
-      expect(dates).toEqual([
-        '2024-01-01',
-        '2024-01-02',
-        '2024-01-03',
-      ]);
+      expect(dates).toEqual(['2024-01-01', '2024-01-02', '2024-01-03']);
     });
 
     it('skips if lastGeneratedDate is today (nothing new to generate)', () => {

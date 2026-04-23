@@ -5,3 +5,5 @@ export * from './settings';
 export * from './budget';
 export * from './recurring';
 export * from './book';
+export * from './tag';
+export * from './quick-template';

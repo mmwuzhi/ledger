@@ -1,6 +1,10 @@
 import { SQLiteDatabase } from 'expo-sqlite';
 import { randomUUID } from 'expo-crypto';
-import { RecurringTransaction, CreateRecurringInput, UpdateRecurringInput } from '../models/recurring';
+import {
+  RecurringTransaction,
+  CreateRecurringInput,
+  UpdateRecurringInput,
+} from '../models/recurring';
 import { IRecurringRepository } from '../repositories/IRecurringRepository';
 
 function now(): string {
@@ -59,7 +63,22 @@ export class SqliteRecurringRepository implements IRecurringRepository {
     await this.db.runAsync(
       `INSERT INTO recurring_transactions (id, type, amount, category_id, note, frequency, day_of_week, day_of_month, start_date, end_date, last_generated_date, enabled, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [id, input.type, input.amount, input.categoryId, input.note ?? '', input.frequency, input.dayOfWeek ?? null, input.dayOfMonth ?? null, input.startDate, input.endDate ?? null, null, 1, timestamp, timestamp]
+      [
+        id,
+        input.type,
+        input.amount,
+        input.categoryId,
+        input.note ?? '',
+        input.frequency,
+        input.dayOfWeek ?? null,
+        input.dayOfMonth ?? null,
+        input.startDate,
+        input.endDate ?? null,
+        null,
+        1,
+        timestamp,
+        timestamp,
+      ]
     );
     return (await this.findById(id))!;
   }
@@ -67,16 +86,46 @@ export class SqliteRecurringRepository implements IRecurringRepository {
   async update(id: string, input: UpdateRecurringInput): Promise<RecurringTransaction> {
     const fields: string[] = [];
     const values: unknown[] = [];
-    if (input.type !== undefined) { fields.push('type = ?'); values.push(input.type); }
-    if (input.amount !== undefined) { fields.push('amount = ?'); values.push(input.amount); }
-    if (input.categoryId !== undefined) { fields.push('category_id = ?'); values.push(input.categoryId); }
-    if (input.note !== undefined) { fields.push('note = ?'); values.push(input.note); }
-    if (input.frequency !== undefined) { fields.push('frequency = ?'); values.push(input.frequency); }
-    if (input.dayOfWeek !== undefined) { fields.push('day_of_week = ?'); values.push(input.dayOfWeek); }
-    if (input.dayOfMonth !== undefined) { fields.push('day_of_month = ?'); values.push(input.dayOfMonth); }
-    if (input.startDate !== undefined) { fields.push('start_date = ?'); values.push(input.startDate); }
-    if (input.endDate !== undefined) { fields.push('end_date = ?'); values.push(input.endDate); }
-    if (input.enabled !== undefined) { fields.push('enabled = ?'); values.push(input.enabled ? 1 : 0); }
+    if (input.type !== undefined) {
+      fields.push('type = ?');
+      values.push(input.type);
+    }
+    if (input.amount !== undefined) {
+      fields.push('amount = ?');
+      values.push(input.amount);
+    }
+    if (input.categoryId !== undefined) {
+      fields.push('category_id = ?');
+      values.push(input.categoryId);
+    }
+    if (input.note !== undefined) {
+      fields.push('note = ?');
+      values.push(input.note);
+    }
+    if (input.frequency !== undefined) {
+      fields.push('frequency = ?');
+      values.push(input.frequency);
+    }
+    if (input.dayOfWeek !== undefined) {
+      fields.push('day_of_week = ?');
+      values.push(input.dayOfWeek);
+    }
+    if (input.dayOfMonth !== undefined) {
+      fields.push('day_of_month = ?');
+      values.push(input.dayOfMonth);
+    }
+    if (input.startDate !== undefined) {
+      fields.push('start_date = ?');
+      values.push(input.startDate);
+    }
+    if (input.endDate !== undefined) {
+      fields.push('end_date = ?');
+      values.push(input.endDate);
+    }
+    if (input.enabled !== undefined) {
+      fields.push('enabled = ?');
+      values.push(input.enabled ? 1 : 0);
+    }
     fields.push('updated_at = ?');
     values.push(now());
     values.push(id);

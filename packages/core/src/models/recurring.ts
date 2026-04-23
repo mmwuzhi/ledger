@@ -10,9 +10,9 @@ export const RecurringTransactionSchema = z.object({
   categoryId: z.string(),
   note: z.string().default(''),
   frequency: RecurringFrequency,
-  dayOfWeek: z.number().min(0).max(6).nullable().default(null),   // 0=Sun, for weekly
+  dayOfWeek: z.number().min(0).max(6).nullable().default(null), // 0=Sun, for weekly
   dayOfMonth: z.number().min(1).max(31).nullable().default(null), // for monthly
-  startDate: z.string(),           // ISO date YYYY-MM-DD
+  startDate: z.string(), // ISO date YYYY-MM-DD
   endDate: z.string().nullable().default(null), // null = no end
   lastGeneratedDate: z.string().nullable().default(null), // track last auto-generation
   enabled: z.boolean().default(true),
@@ -23,8 +23,17 @@ export const RecurringTransactionSchema = z.object({
 
 export type RecurringTransaction = z.infer<typeof RecurringTransactionSchema>;
 
-export type CreateRecurringInput = Pick<RecurringTransaction,
-  'type' | 'amount' | 'categoryId' | 'note' | 'frequency' | 'dayOfWeek' | 'dayOfMonth' | 'startDate' | 'endDate'
+export type CreateRecurringInput = Pick<
+  RecurringTransaction,
+  | 'type'
+  | 'amount'
+  | 'categoryId'
+  | 'note'
+  | 'frequency'
+  | 'dayOfWeek'
+  | 'dayOfMonth'
+  | 'startDate'
+  | 'endDate'
 >;
 
 export type UpdateRecurringInput = Partial<CreateRecurringInput & { enabled: boolean }>;
