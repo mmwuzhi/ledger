@@ -99,14 +99,12 @@ export default function MePage() {
 
   return (
     <div
-      className="min-h-screen flex flex-col"
-      style={{
-        background: CANVAS,
-        fontFamily: 'system-ui, sans-serif',
-        WebkitFontSmoothing: 'antialiased',
-        maxWidth: 480,
-        margin: '0 auto',
-      }}
+      className="min-h-screen"
+      style={{ background: CANVAS, fontFamily: 'system-ui, sans-serif', WebkitFontSmoothing: 'antialiased' }}
+    >
+    <div
+      className="flex flex-col min-h-screen"
+      style={{ maxWidth: 640, margin: '0 auto' }}
     >
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-5 pt-12 pb-4">
@@ -211,6 +209,7 @@ export default function MePage() {
         </div>
 
       </div>
+    </div>
     </div>
   );
 }

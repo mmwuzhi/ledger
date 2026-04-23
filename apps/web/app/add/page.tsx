@@ -214,14 +214,12 @@ export default function AddPage() {
 
   return (
     <div
-      className="min-h-screen flex flex-col"
-      style={{
-        background: CANVAS,
-        fontFamily: 'system-ui, sans-serif',
-        WebkitFontSmoothing: 'antialiased',
-        maxWidth: 480,
-        margin: '0 auto',
-      }}
+      className="min-h-screen"
+      style={{ background: CANVAS, fontFamily: 'system-ui, sans-serif', WebkitFontSmoothing: 'antialiased' }}
+    >
+    <div
+      className="flex flex-col min-h-screen"
+      style={{ maxWidth: 640, margin: '0 auto' }}
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
@@ -240,7 +238,6 @@ export default function AddPage() {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
           </svg>
-          取消
         </button>
         <span className="text-base font-semibold text-stone-700 tracking-tight">记一笔</span>
         <div style={{ width: 52 }} />
@@ -551,6 +548,7 @@ export default function AddPage() {
           {addMutation.isPending ? '保存中…' : '＋ 记一笔'}
         </button>
       </div>
+    </div>
     </div>
   );
 }

@@ -13,11 +13,21 @@ export function getDb(): Client {
   return client;
 }
 
-export async function initDb(): Promise<void> {
-  const db = getDb();
-  await db.executeMultiple(CREATE_TABLES_SQL);
-  await db.executeMultiple(DEFAULT_BOOK_SQL);
-  await db.executeMultiple(DEFAULT_CATEGORIES_SQL);
+// Singleton promise — schema creation runs exactly once per server process.
+// Without this, every API request ran 3 round-trips to Turso before its
+// actual query, causing 30-90 s hangs on cold connections.
+let initDbPromise: Promise<void> | null = null;
+
+export function initDb(): Promise<void> {
+  if (!initDbPromise) {
+    initDbPromise = (async () => {
+      const db = getDb();
+      await db.executeMultiple(CREATE_TABLES_SQL);
+      await db.executeMultiple(DEFAULT_BOOK_SQL);
+      await db.executeMultiple(DEFAULT_CATEGORIES_SQL);
+    })();
+  }
+  return initDbPromise;
 }
 
 export function rowToObject(row: Row, columns: string[]): Record<string, unknown> {
