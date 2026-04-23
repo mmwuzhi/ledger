@@ -11,4 +11,6 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': ['ts-jest', { tsconfig: { jsx: 'react' } }],
   },
+  // Allow ts-jest to transform next/* packages (they ship ESM which Node can't run directly)
+  transformIgnorePatterns: ['node_modules/(?!(next)/)'],
 };
