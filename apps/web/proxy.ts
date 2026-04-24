@@ -9,7 +9,7 @@ import { NextResponse, type NextRequest } from 'next/server';
  * password. Enter anything as the username and your SITE_PASSWORD as the
  * password.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const password = process.env.SITE_PASSWORD;
 
   // No password configured → allow everything (local dev default)
