@@ -50,7 +50,7 @@ export class SqliteCategoryRepository implements ICategoryRepository {
 
   async update(id: string, input: UpdateCategoryInput): Promise<Category> {
     const fields: string[] = [];
-    const values: unknown[] = [];
+    const values: (string | number | null)[] = [];
     if (input.name !== undefined) {
       fields.push('name = ?');
       values.push(input.name);
