@@ -2,6 +2,7 @@ import type { NextConfig } from 'next';
 import path from 'path';
 
 const nextConfig: NextConfig = {
+  basePath: '/ledger',
   transpilePackages: ['@moneybook/core'],
   turbopack: {
     root: path.resolve(__dirname, '../..'),
