@@ -3,6 +3,9 @@ import path from 'path';
 
 const nextConfig: NextConfig = {
   basePath: '/ledger',
+  async redirects() {
+    return [{ source: '/', destination: '/ledger', basePath: false, permanent: false }];
+  },
   transpilePackages: ['@moneybook/core'],
   turbopack: {
     root: path.resolve(__dirname, '../..'),
