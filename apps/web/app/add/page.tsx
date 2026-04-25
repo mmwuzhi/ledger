@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import type { Category, Transaction } from '@moneybook/core';
 import type { OcrResult } from '@/app/api/ocr/route';
+import { getBool, SETTINGS_KEYS } from '@/lib/settings';
 
 // ── Design tokens (same as home page) ──────────────────────────────────────
 
@@ -40,6 +41,7 @@ function sanitizeAmount(val: string): string {
 // ── Types ────────────────────────────────────────────────────────────────────
 
 type Attachment = { id: string; name: string; url: string; isImage: boolean };
+type CurrencyOption = { code: string; symbol: string };
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
@@ -57,6 +59,29 @@ export default function AddPage() {
   // 代付 linking (UI only — full DB linking deferred to a future step)
   const [linkedTxId, setLinkedTxId] = useState<string | null>(null);
   const [showLinkPicker, setShowLinkPicker] = useState(false);
+
+  // Settings (read from localStorage on mount)
+  const [ocrAutoAttach, setOcrAutoAttach] = useState(true);
+  const [multiCurrency, setMultiCurrency] = useState(false);
+  const [enabledCurrencies, setEnabledCurrencies] = useState<CurrencyOption[]>([]);
+  const [currency, setCurrency] = useState('CNY');
+
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    setOcrAutoAttach(getBool(SETTINGS_KEYS.ocrAutoAttach, true));
+    const mc = getBool(SETTINGS_KEYS.multiCurrency, false);
+    setMultiCurrency(mc);
+    if (mc) {
+      try {
+        const stored = localStorage.getItem(SETTINGS_KEYS.currencies);
+        const parsed: CurrencyOption[] = stored ? JSON.parse(stored) : [];
+        if (parsed.length > 0) setEnabledCurrencies(parsed);
+      } catch {
+        // ignore parse errors
+      }
+    }
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // OCR state
   const [ocrImage, setOcrImage] = useState<string | null>(null);
@@ -121,6 +146,7 @@ export default function AddPage() {
       // Store as UTC midnight so date comparisons work correctly
       date: `${date}T00:00:00.000Z`,
       note: note.trim(),
+      currency,
     };
     addMutation.mutate(payload);
   }
@@ -170,12 +196,13 @@ export default function AddPage() {
         if (result.note) setNote(result.note);
         if (result.date) setDate(result.date);
         setOcrState('done');
-        // Auto-add OCR image to attachments
-        // TODO: respect user setting "识别后自动添加附件" (default: on)
-        setAttachments((prev) => [
-          ...prev,
-          { id: Math.random().toString(36).slice(2), name: file.name, url: dataUrl, isImage: true },
-        ]);
+        // Auto-add OCR image to attachments (respects "识别后自动添加附件" setting)
+        if (ocrAutoAttach) {
+          setAttachments((prev) => [
+            ...prev,
+            { id: Math.random().toString(36).slice(2), name: file.name, url: dataUrl, isImage: true },
+          ]);
+        }
       } catch {
         setOcrState('error');
       }
@@ -209,6 +236,14 @@ export default function AddPage() {
   const amountColor = txType === 'expense' ? RED : GREEN;
   const toggleBg = txType === 'expense' ? 'rgba(181,64,42,0.08)' : 'rgba(45,122,79,0.08)';
   const canSubmit = !!catId && !!amount && parseFloat(amount) > 0 && !addMutation.isPending;
+
+  // The symbol for the currently selected currency
+  const currencySymbol =
+    enabledCurrencies.find((c) => c.code === currency)?.symbol ?? '¥';
+
+  // All currencies for picker: user's enabled list; fallback to CNY
+  const allCurrencies: CurrencyOption[] =
+    enabledCurrencies.length > 0 ? enabledCurrencies : [{ code: 'CNY', symbol: '¥' }];
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -264,6 +299,28 @@ export default function AddPage() {
           ))}
         </div>
 
+        {/* ── Currency picker (only when multi-currency is enabled) ── */}
+        {multiCurrency && allCurrencies.length > 1 && (
+          <div className="flex gap-2 px-1">
+            {allCurrencies.map((opt) => (
+              <button
+                key={opt.code}
+                onClick={() => setCurrency(opt.code)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
+                style={{
+                  background: currency === opt.code ? `${TERRA}18` : '#fff',
+                  color: currency === opt.code ? TERRA : '#a8a29e',
+                  outline: currency === opt.code ? `1.5px solid ${TERRA}40` : '1.5px solid #e8e2d8',
+                  touchAction: 'manipulation',
+                }}
+              >
+                <span>{opt.symbol}</span>
+                <span>{opt.code}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* ── Amount card ── */}
         <div
           className="rounded-3xl px-5 pt-5 pb-6"
@@ -317,7 +374,7 @@ export default function AddPage() {
               className="font-bold tabular-nums transition-colors duration-300"
               style={{ fontFamily: NUNITO, fontSize: 22, color: amountColor, opacity: 0.5, letterSpacing: '-0.01em' }}
             >
-              ¥
+              {currencySymbol}
             </span>
             <input
               type="text"

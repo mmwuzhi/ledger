@@ -50,14 +50,14 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { type, amount, categoryId, date, note, receiptId } = body;
+    const { type, amount, categoryId, date, note, receiptId, currency } = body;
 
     if (!type || amount == null || !categoryId || !date) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     const repo = await getRepo();
-    const input: CreateTransactionInput = { type, amount, categoryId, date, note, receiptId };
+    const input: CreateTransactionInput = { type, amount, categoryId, date, note, receiptId, currency };
     const transaction = await repo.create(input);
     return NextResponse.json(transaction, { status: 201 });
   } catch (error) {
