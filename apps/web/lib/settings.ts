@@ -3,7 +3,8 @@
 export const SETTINGS_KEYS = {
   hideIncome: 'mb_hide_income',
   multiCurrency: 'mb_multi_currency',
-  currencies: 'mb_currencies', // JSON array of { code, symbol }
+  currencies: 'mb_currencies',        // JSON array of { code, symbol }
+  defaultCurrency: 'mb_default_currency', // string, e.g. 'JPY'
   ocrAutoAttach: 'mb_ocr_auto_attach',
 } as const;
 

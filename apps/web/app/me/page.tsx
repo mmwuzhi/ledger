@@ -177,7 +177,7 @@ export default function MePage() {
               <Row
                 icon="🌐"
                 label="管理货币列表"
-                sub="选择需要的货币，汇率参考 (TODO)"
+                sub="选择启用的货币，设置默认货币"
                 onClick={() => router.push('/me/currencies')}
                 last
               />

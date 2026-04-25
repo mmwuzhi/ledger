@@ -71,15 +71,15 @@ export default function AddPage() {
     setOcrAutoAttach(getBool(SETTINGS_KEYS.ocrAutoAttach, true));
     const mc = getBool(SETTINGS_KEYS.multiCurrency, false);
     setMultiCurrency(mc);
-    if (mc) {
-      try {
-        const stored = localStorage.getItem(SETTINGS_KEYS.currencies);
-        const parsed: CurrencyOption[] = stored ? JSON.parse(stored) : [];
-        if (parsed.length > 0) setEnabledCurrencies(parsed);
-      } catch {
-        // ignore parse errors
-      }
+    try {
+      const stored = localStorage.getItem(SETTINGS_KEYS.currencies);
+      const parsed: CurrencyOption[] = stored ? JSON.parse(stored) : [];
+      if (parsed.length > 0) setEnabledCurrencies(parsed);
+    } catch {
+      // ignore parse errors
     }
+    const def = localStorage.getItem(SETTINGS_KEYS.defaultCurrency);
+    if (def) setCurrency(def);
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -237,13 +237,12 @@ export default function AddPage() {
   const toggleBg = txType === 'expense' ? 'rgba(181,64,42,0.08)' : 'rgba(45,122,79,0.08)';
   const canSubmit = !!catId && !!amount && parseFloat(amount) > 0 && !addMutation.isPending;
 
-  // The symbol for the currently selected currency
-  const currencySymbol =
-    enabledCurrencies.find((c) => c.code === currency)?.symbol ?? '¥';
-
-  // All currencies for picker: user's enabled list; fallback to CNY
+  // All currencies for picker: user's enabled list; fallback to current default
   const allCurrencies: CurrencyOption[] =
-    enabledCurrencies.length > 0 ? enabledCurrencies : [{ code: 'CNY', symbol: '¥' }];
+    enabledCurrencies.length > 0 ? enabledCurrencies : [{ code: currency, symbol: '¥' }];
+
+  // The symbol for the currently selected currency
+  const currencySymbol = allCurrencies.find((c) => c.code === currency)?.symbol ?? '¥';
 
   // ── Render ────────────────────────────────────────────────────────────────
 
