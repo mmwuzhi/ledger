@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'MoneyBook',
+  title: 'Ledger',
   description: '个人记账应用',
 };
 
