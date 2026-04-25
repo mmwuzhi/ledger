@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import type { Transaction, Category } from '@moneybook/core';
 import { getBool, SETTINGS_KEYS } from '@/lib/settings';
+import { apiBase } from '@/lib/api';
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
@@ -147,8 +148,8 @@ function Sidebar({
           }}
         >
           {hideIncome
-            ? `-¥${totalExpense.toLocaleString()}`
-            : `${net >= 0 ? '+' : '-'}¥${Math.abs(net).toLocaleString()}`}
+            ? `${totalExpense > 0 ? '-' : ''}¥${totalExpense.toLocaleString()}`
+            : `${net > 0 ? '+' : net < 0 ? '-' : ''}¥${Math.abs(net).toLocaleString()}`}
         </p>
         <div className="flex flex-col gap-2">
           {!hideIncome && (
@@ -168,7 +169,7 @@ function Sidebar({
               className="font-bold tabular-nums text-sm"
               style={{ fontFamily: NUNITO, color: RED }}
             >
-              -¥{totalExpense.toLocaleString()}
+              {totalExpense > 0 ? '-' : ''}¥{totalExpense.toLocaleString()}
             </span>
           </div>
         </div>
@@ -346,17 +347,17 @@ export default function HomeList() {
   const { data: rawTransactions = [], isLoading: txLoading } = useQuery<Transaction[]>({
     queryKey: ['transactions', dateFrom, dateTo],
     queryFn: () =>
-      fetch(`/api/transactions?dateFrom=${dateFrom}&dateTo=${dateTo}`).then((r) => r.json()),
+      fetch(`${apiBase}/api/transactions?dateFrom=${dateFrom}&dateTo=${dateTo}`).then((r) => r.json()),
   });
 
   const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ['categories'],
-    queryFn: () => fetch('/api/categories').then((r) => r.json()),
+    queryFn: () => fetch(`${apiBase}/api/categories`).then((r) => r.json()),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) =>
-      fetch('/api/transactions', {
+      fetch(`${apiBase}/api/transactions`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),
@@ -460,8 +461,8 @@ export default function HomeList() {
                   }}
                 >
                   {hideIncome
-                    ? `-¥${totalExpense.toLocaleString()}`
-                    : `${net >= 0 ? '+' : '-'}¥${Math.abs(net).toLocaleString()}`}
+                    ? `${totalExpense > 0 ? '-' : ''}¥${totalExpense.toLocaleString()}`
+                    : `${net > 0 ? '+' : net < 0 ? '-' : ''}¥${Math.abs(net).toLocaleString()}`}
                 </p>
               </div>
               {!hideIncome && (
@@ -479,7 +480,7 @@ export default function HomeList() {
                       letterSpacing: '-0.015em',
                     }}
                   >
-                    -¥{totalExpense.toLocaleString()}
+                    {totalExpense > 0 ? '-' : ''}¥{totalExpense.toLocaleString()}
                   </p>
                 </div>
               )}

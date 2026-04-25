@@ -1,8 +1,11 @@
 import type { NextConfig } from 'next';
 import path from 'path';
 
+const BASE_PATH = '/ledger';
+
 const nextConfig: NextConfig = {
-  basePath: '/ledger',
+  basePath: BASE_PATH,
+  env: { NEXT_PUBLIC_BASE_PATH: BASE_PATH },
   async redirects() {
     return [{ source: '/', destination: '/ledger', basePath: false, permanent: false }];
   },

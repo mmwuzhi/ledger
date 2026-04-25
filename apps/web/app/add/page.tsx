@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import type { Category, Transaction } from '@moneybook/core';
 import type { OcrResult } from '@/app/api/ocr/route';
 import { getBool, SETTINGS_KEYS } from '@/lib/settings';
+import { apiBase } from '@/lib/api';
 
 // ── Design tokens (same as home page) ──────────────────────────────────────
 
@@ -96,7 +97,7 @@ export default function AddPage() {
 
   const { data: categories = [], isLoading: catsLoading } = useQuery<Category[]>({
     queryKey: ['categories'],
-    queryFn: () => fetch('/api/categories').then((r) => r.json()),
+    queryFn: () => fetch(`${apiBase}/api/categories`).then((r) => r.json()),
   });
 
   const isReimburse = catId === CAT_SHOU_KUAN_ID;
@@ -105,7 +106,7 @@ export default function AddPage() {
   const { data: daiFuTxns = [] } = useQuery<Transaction[]>({
     queryKey: ['transactions', 'daiFu'],
     queryFn: () =>
-      fetch(`/api/transactions?categoryId=${CAT_DAI_FU_ID}`).then((r) => r.json()),
+      fetch(`${apiBase}/api/transactions?categoryId=${CAT_DAI_FU_ID}`).then((r) => r.json()),
     enabled: isReimburse,
     staleTime: 10_000,
   });
@@ -123,7 +124,7 @@ export default function AddPage() {
 
   const addMutation = useMutation({
     mutationFn: (body: object) =>
-      fetch('/api/transactions', {
+      fetch(`${apiBase}/api/transactions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -185,7 +186,7 @@ export default function AddPage() {
       setOcrImage(dataUrl);
       setOcrState('loading');
       try {
-        const res = await fetch('/api/ocr', {
+        const res = await fetch(`${apiBase}/api/ocr`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: dataUrl }),
