@@ -67,7 +67,7 @@ export class SqliteQuickTemplateRepository implements IQuickTemplateRepository {
 
   async update(id: string, input: UpdateQuickTemplateInput): Promise<QuickTemplate> {
     const fields: string[] = [];
-    const values: unknown[] = [];
+    const values: (string | number | null)[] = [];
     if (input.name !== undefined) {
       fields.push('name = ?');
       values.push(input.name);

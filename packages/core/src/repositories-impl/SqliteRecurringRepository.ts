@@ -85,7 +85,7 @@ export class SqliteRecurringRepository implements IRecurringRepository {
 
   async update(id: string, input: UpdateRecurringInput): Promise<RecurringTransaction> {
     const fields: string[] = [];
-    const values: unknown[] = [];
+    const values: (string | number | null)[] = [];
     if (input.type !== undefined) {
       fields.push('type = ?');
       values.push(input.type);

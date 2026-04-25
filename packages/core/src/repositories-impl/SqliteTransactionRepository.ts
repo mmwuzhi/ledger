@@ -131,7 +131,7 @@ export class SqliteTransactionRepository implements ITransactionRepository {
 
   async update(id: string, input: UpdateTransactionInput): Promise<Transaction> {
     const fields: string[] = [];
-    const values: unknown[] = [];
+    const values: (string | number | null)[] = [];
     if (input.type !== undefined) {
       fields.push('type = ?');
       values.push(input.type);
