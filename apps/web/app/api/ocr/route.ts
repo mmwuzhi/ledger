@@ -62,7 +62,7 @@ Respond with ONLY valid JSON, no explanation:
             ],
           },
         ],
-        generationConfig: { temperature: 0, maxOutputTokens: 256 },
+        generationConfig: { temperature: 0, maxOutputTokens: 1024 },
       }),
     }
   );
