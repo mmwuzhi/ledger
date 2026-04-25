@@ -59,7 +59,7 @@ export class SqliteTransactionRepository implements ITransactionRepository {
 
   async search(filters: TransactionSearchFilters): Promise<Transaction[]> {
     const conditions: string[] = ['deleted_at IS NULL'];
-    const params: unknown[] = [];
+    const params: (string | number | null)[] = [];
 
     if (filters.keyword) {
       conditions.push('note LIKE ?');
