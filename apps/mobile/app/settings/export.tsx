@@ -41,10 +41,10 @@ export default function ExportScreen() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-canvas">
       <View className="bg-white px-4 pt-14 pb-4 border-b border-gray-100 flex-row items-center">
         <TouchableOpacity onPress={() => router.back()}>
-          <Text className="text-indigo-500 text-base">← 返回</Text>
+          <Text className="text-primary text-base">← 返回</Text>
         </TouchableOpacity>
         <Text className="text-lg font-bold text-gray-900 ml-4">数据导出</Text>
       </View>
@@ -58,7 +58,7 @@ export default function ExportScreen() {
         </View>
 
         <TouchableOpacity
-          className={`rounded-xl py-4 items-center ${exporting ? 'bg-indigo-300' : 'bg-indigo-500'}`}
+          className={`rounded-xl py-4 items-center ${exporting ? 'bg-primary/60' : 'bg-primary'}`}
           onPress={handleExport}
           disabled={exporting}
         >

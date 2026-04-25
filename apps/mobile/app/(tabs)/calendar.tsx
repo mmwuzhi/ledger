@@ -1,11 +1,5 @@
 import { useState, useMemo } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  ScrollView,
-} from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useRouter } from 'expo-router';
 import {
@@ -48,20 +42,18 @@ export default function CalendarScreen() {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
-  const [selectedDate, setSelectedDate] = useState<string | null>(
-    now.toISOString().slice(0, 10),
-  );
+  const [selectedDate, setSelectedDate] = useState<string | null>(now.toISOString().slice(0, 10));
 
   const { data: calendarData } = useCalendarMonth(transactionRepo, year, month);
   const { data: dayTransactions = [] } = useDayTransactions(
     transactionRepo,
-    selectedDate ?? now.toISOString().slice(0, 10),
+    selectedDate ?? now.toISOString().slice(0, 10)
   );
   const { data: categories = [] } = useCategories(categoryRepo);
 
   const categoryMap = useMemo(
-    () => Object.fromEntries(categories.map(c => [c.id, c])),
-    [categories],
+    () => Object.fromEntries(categories.map((c) => [c.id, c])),
+    [categories]
   );
 
   const weeks = useMemo(() => getMonthGrid(year, month), [year, month]);
@@ -69,8 +61,14 @@ export default function CalendarScreen() {
   const navigateMonth = (delta: number) => {
     let newMonth = month + delta;
     let newYear = year;
-    if (newMonth < 1) { newMonth = 12; newYear--; }
-    if (newMonth > 12) { newMonth = 1; newYear++; }
+    if (newMonth < 1) {
+      newMonth = 12;
+      newYear--;
+    }
+    if (newMonth > 12) {
+      newMonth = 1;
+      newYear++;
+    }
     setMonth(newMonth);
     setYear(newYear);
     setSelectedDate(null);
@@ -88,7 +86,7 @@ export default function CalendarScreen() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-canvas">
       {/* Header */}
       <View className="bg-white px-4 pt-14 pb-2 border-b border-gray-100">
         <Text className="text-2xl font-bold text-gray-900 mb-2">日历</Text>
@@ -96,13 +94,13 @@ export default function CalendarScreen() {
         {/* Month navigation */}
         <View className="flex-row items-center justify-between mb-2">
           <TouchableOpacity onPress={() => navigateMonth(-1)} className="px-3 py-1">
-            <Text className="text-indigo-500 text-lg">‹</Text>
+            <Text className="text-primary text-lg">‹</Text>
           </TouchableOpacity>
           <Text className="text-base font-semibold text-gray-900">
             {year}年{month}月
           </Text>
           <TouchableOpacity onPress={() => navigateMonth(1)} className="px-3 py-1">
-            <Text className="text-indigo-500 text-lg">›</Text>
+            <Text className="text-primary text-lg">›</Text>
           </TouchableOpacity>
         </View>
 
@@ -115,13 +113,14 @@ export default function CalendarScreen() {
             支出 ¥{(calendarData?.totalExpense ?? 0).toFixed(2)}
           </Text>
           <Text className="text-sm text-gray-600">
-            结余 ¥{((calendarData?.totalIncome ?? 0) - (calendarData?.totalExpense ?? 0)).toFixed(2)}
+            结余 ¥
+            {((calendarData?.totalIncome ?? 0) - (calendarData?.totalExpense ?? 0)).toFixed(2)}
           </Text>
         </View>
 
         {/* Weekday headers */}
         <View className="flex-row">
-          {WEEKDAY_LABELS.map(label => (
+          {WEEKDAY_LABELS.map((label) => (
             <View key={label} className="flex-1 items-center py-1">
               <Text className="text-xs text-gray-400">{label}</Text>
             </View>
@@ -144,13 +143,13 @@ export default function CalendarScreen() {
                 <TouchableOpacity
                   key={day}
                   className={`flex-1 items-center py-1.5 rounded-lg mx-0.5 ${
-                    isSelected ? 'bg-indigo-500' : today ? 'bg-indigo-50' : ''
+                    isSelected ? 'bg-primary' : today ? 'bg-primary/10' : ''
                   }`}
                   onPress={() => setSelectedDate(dateKey)}
                 >
                   <Text
                     className={`text-sm font-medium ${
-                      isSelected ? 'text-white' : today ? 'text-indigo-500' : 'text-gray-900'
+                      isSelected ? 'text-white' : today ? 'text-primary' : 'text-gray-900'
                     }`}
                   >
                     {day}
@@ -183,7 +182,7 @@ export default function CalendarScreen() {
 
           <FlatList
             data={dayTransactions}
-            keyExtractor={item => item.id}
+            keyExtractor={(item) => item.id}
             contentContainerStyle={{ padding: 16, gap: 8 }}
             renderItem={({ item }) => {
               const cat = categoryMap[item.categoryId];

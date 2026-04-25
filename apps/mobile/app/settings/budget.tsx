@@ -1,13 +1,5 @@
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  TextInput,
-  Modal,
-} from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, TextInput, Modal } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useRouter } from 'expo-router';
 import {
@@ -36,7 +28,13 @@ export default function BudgetScreen() {
   const [month, setMonth] = useState(now.getMonth() + 1);
 
   const { data: budgets = [] } = useBudgets(budgetRepo, year, month);
-  const { data: progress = [] } = useBudgetProgress(budgetRepo, transactionRepo, categoryRepo, year, month);
+  const { data: progress = [] } = useBudgetProgress(
+    budgetRepo,
+    transactionRepo,
+    categoryRepo,
+    year,
+    month
+  );
   const { data: categories = [] } = useCategories(categoryRepo);
   const createBudget = useCreateBudget(budgetRepo, year, month);
   const updateBudget = useUpdateBudget(budgetRepo, year, month);
@@ -47,14 +45,20 @@ export default function BudgetScreen() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [amount, setAmount] = useState('');
 
-  const expenseCategories = categories.filter(c => c.type === 'expense' || c.type === 'both');
-  const existingCategoryIds = new Set(budgets.map(b => b.categoryId));
+  const expenseCategories = categories.filter((c) => c.type === 'expense' || c.type === 'both');
+  const existingCategoryIds = new Set(budgets.map((b) => b.categoryId));
 
   const navigateMonth = (delta: number) => {
     let newMonth = month + delta;
     let newYear = year;
-    if (newMonth < 1) { newMonth = 12; newYear--; }
-    if (newMonth > 12) { newMonth = 1; newYear++; }
+    if (newMonth < 1) {
+      newMonth = 12;
+      newYear--;
+    }
+    if (newMonth > 12) {
+      newMonth = 1;
+      newYear++;
+    }
     setMonth(newMonth);
     setYear(newYear);
   };
@@ -67,7 +71,7 @@ export default function BudgetScreen() {
   };
 
   const openEditModal = (p: BudgetProgress) => {
-    const budget = budgets.find(b => b.id === p.budgetId);
+    const budget = budgets.find((b) => b.id === p.budgetId);
     if (!budget) return;
     setEditingBudget(budget);
     setSelectedCategoryId(budget.categoryId);
@@ -84,12 +88,12 @@ export default function BudgetScreen() {
     if (editingBudget) {
       updateBudget.mutate(
         { id: editingBudget.id, input: { amount: parsedAmount } },
-        { onSuccess: () => setModalVisible(false) },
+        { onSuccess: () => setModalVisible(false) }
       );
     } else {
       createBudget.mutate(
         { categoryId: selectedCategoryId, amount: parsedAmount, year, month },
-        { onSuccess: () => setModalVisible(false) },
+        { onSuccess: () => setModalVisible(false) }
       );
     }
   };
@@ -108,43 +112,43 @@ export default function BudgetScreen() {
   const getProgressColor = (percentage: number) => {
     if (percentage >= 100) return 'bg-red-500';
     if (percentage >= 80) return 'bg-yellow-500';
-    return 'bg-indigo-500';
+    return 'bg-primary';
   };
 
   const getProgressTextColor = (percentage: number) => {
     if (percentage >= 100) return 'text-red-500';
     if (percentage >= 80) return 'text-yellow-500';
-    return 'text-indigo-500';
+    return 'text-primary';
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-canvas">
       <View className="bg-white px-4 pt-14 pb-4 border-b border-gray-100 flex-row items-center justify-between">
         <TouchableOpacity onPress={() => router.back()}>
-          <Text className="text-indigo-500 text-base">← 返回</Text>
+          <Text className="text-primary text-base">← 返回</Text>
         </TouchableOpacity>
         <Text className="text-lg font-bold text-gray-900">预算管理</Text>
         <TouchableOpacity onPress={openAddModal}>
-          <Text className="text-indigo-500 text-base">添加</Text>
+          <Text className="text-primary text-base">添加</Text>
         </TouchableOpacity>
       </View>
 
       {/* Month Selector */}
       <View className="bg-white px-4 py-3 flex-row items-center justify-center gap-6 border-b border-gray-100">
         <TouchableOpacity onPress={() => navigateMonth(-1)}>
-          <Text className="text-indigo-500 text-lg">‹</Text>
+          <Text className="text-primary text-lg">‹</Text>
         </TouchableOpacity>
         <Text className="text-base font-semibold text-gray-900">
           {year}年{month}月
         </Text>
         <TouchableOpacity onPress={() => navigateMonth(1)}>
-          <Text className="text-indigo-500 text-lg">›</Text>
+          <Text className="text-primary text-lg">›</Text>
         </TouchableOpacity>
       </View>
 
       <FlatList
         data={progress}
-        keyExtractor={item => item.budgetId}
+        keyExtractor={(item) => item.budgetId}
         contentContainerStyle={{ padding: 16, gap: 12 }}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -171,12 +175,8 @@ export default function BudgetScreen() {
             </View>
 
             <View className="flex-row justify-between">
-              <Text className="text-sm text-gray-500">
-                已花 ¥{item.spentAmount.toFixed(2)}
-              </Text>
-              <Text className="text-sm text-gray-500">
-                预算 ¥{item.budgetAmount.toFixed(2)}
-              </Text>
+              <Text className="text-sm text-gray-500">已花 ¥{item.spentAmount.toFixed(2)}</Text>
+              <Text className="text-sm text-gray-500">预算 ¥{item.budgetAmount.toFixed(2)}</Text>
             </View>
 
             {item.isOverBudget && (
@@ -209,34 +209,47 @@ export default function BudgetScreen() {
                 <View className="flex-row flex-wrap gap-2 mb-4">
                   <TouchableOpacity
                     className={`px-3 py-2 rounded-lg ${
-                      selectedCategoryId === null ? 'bg-indigo-500' : 'bg-gray-100'
+                      selectedCategoryId === null ? 'bg-primary' : 'bg-gray-100'
                     }`}
                     onPress={() => setSelectedCategoryId(null)}
                     disabled={existingCategoryIds.has(null)}
                   >
-                    <Text className={`text-sm ${
-                      selectedCategoryId === null ? 'text-white' :
-                      existingCategoryIds.has(null) ? 'text-gray-300' : 'text-gray-700'
-                    }`}>
+                    <Text
+                      className={`text-sm ${
+                        selectedCategoryId === null
+                          ? 'text-white'
+                          : existingCategoryIds.has(null)
+                            ? 'text-gray-300'
+                            : 'text-gray-700'
+                      }`}
+                    >
                       💰 总预算
                     </Text>
                   </TouchableOpacity>
-                  {expenseCategories.map(cat => {
+                  {expenseCategories.map((cat) => {
                     const alreadySet = existingCategoryIds.has(cat.id);
                     return (
                       <TouchableOpacity
                         key={cat.id}
                         className={`px-3 py-2 rounded-lg ${
-                          selectedCategoryId === cat.id ? 'bg-indigo-500' :
-                          alreadySet ? 'bg-gray-50' : 'bg-gray-100'
+                          selectedCategoryId === cat.id
+                            ? 'bg-primary'
+                            : alreadySet
+                              ? 'bg-canvas'
+                              : 'bg-gray-100'
                         }`}
                         onPress={() => setSelectedCategoryId(cat.id)}
                         disabled={alreadySet}
                       >
-                        <Text className={`text-sm ${
-                          selectedCategoryId === cat.id ? 'text-white' :
-                          alreadySet ? 'text-gray-300' : 'text-gray-700'
-                        }`}>
+                        <Text
+                          className={`text-sm ${
+                            selectedCategoryId === cat.id
+                              ? 'text-white'
+                              : alreadySet
+                                ? 'text-gray-300'
+                                : 'text-gray-700'
+                          }`}
+                        >
                           {cat.icon} {cat.name}
                         </Text>
                       </TouchableOpacity>
@@ -263,7 +276,7 @@ export default function BudgetScreen() {
                 <Text className="text-gray-700 font-medium">取消</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="flex-1 py-3 rounded-lg bg-indigo-500 items-center"
+                className="flex-1 py-3 rounded-lg bg-primary items-center"
                 onPress={handleSave}
               >
                 <Text className="text-white font-medium">保存</Text>

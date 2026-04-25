@@ -1,13 +1,5 @@
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  TextInput,
-  Modal,
-} from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, TextInput, Modal } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useRouter } from 'expo-router';
 import {
@@ -60,7 +52,7 @@ export default function CategoriesScreen() {
     if (editingCategory) {
       updateCategory.mutate(
         { id: editingCategory.id, input: { name: name.trim(), icon, type } },
-        { onSuccess: () => setModalVisible(false) },
+        { onSuccess: () => setModalVisible(false) }
       );
     } else {
       createCategory.mutate(input, { onSuccess: () => setModalVisible(false) });
@@ -92,14 +84,14 @@ export default function CategoriesScreen() {
   ];
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-canvas">
       <View className="bg-white px-4 pt-14 pb-4 border-b border-gray-100 flex-row items-center justify-between">
         <TouchableOpacity onPress={() => router.back()}>
-          <Text className="text-indigo-500 text-base">← 返回</Text>
+          <Text className="text-primary text-base">← 返回</Text>
         </TouchableOpacity>
         <Text className="text-lg font-bold text-gray-900">分类管理</Text>
         <TouchableOpacity onPress={openAddModal}>
-          <Text className="text-indigo-500 text-base">添加</Text>
+          <Text className="text-primary text-base">添加</Text>
         </TouchableOpacity>
       </View>
 
@@ -110,7 +102,7 @@ export default function CategoriesScreen() {
       ) : (
         <FlatList
           data={categories}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: 16, gap: 8 }}
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -164,11 +156,11 @@ export default function CategoriesScreen() {
 
             <Text className="text-sm text-gray-500 mb-2">类型</Text>
             <View className="flex-row gap-2 mb-6">
-              {typeOptions.map(opt => (
+              {typeOptions.map((opt) => (
                 <TouchableOpacity
                   key={opt.value}
                   className={`flex-1 py-2 rounded-lg items-center ${
-                    type === opt.value ? 'bg-indigo-500' : 'bg-gray-100'
+                    type === opt.value ? 'bg-primary' : 'bg-gray-100'
                   }`}
                   onPress={() => setType(opt.value)}
                 >
@@ -191,7 +183,7 @@ export default function CategoriesScreen() {
                 <Text className="text-gray-700 font-medium">取消</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="flex-1 py-3 rounded-lg bg-indigo-500 items-center"
+                className="flex-1 py-3 rounded-lg bg-primary items-center"
                 onPress={handleSave}
               >
                 <Text className="text-white font-medium">保存</Text>

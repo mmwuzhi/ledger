@@ -25,10 +25,10 @@ export default function CurrencyScreen() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-canvas">
       <View className="bg-white px-4 pt-14 pb-4 border-b border-gray-100 flex-row items-center">
         <TouchableOpacity onPress={() => router.back()}>
-          <Text className="text-indigo-500 text-base">← 返回</Text>
+          <Text className="text-primary text-base">← 返回</Text>
         </TouchableOpacity>
         <Text className="text-lg font-bold text-gray-900 ml-4">货币符号</Text>
       </View>
@@ -50,7 +50,7 @@ export default function CurrencyScreen() {
                 }`}
               >
                 {currentCurrency === opt.symbol && (
-                  <View className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
+                  <View className="w-2.5 h-2.5 rounded-full bg-primary" />
                 )}
               </View>
             </TouchableOpacity>

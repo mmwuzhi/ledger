@@ -1,13 +1,5 @@
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  TextInput,
-  Modal,
-} from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, TextInput, Modal } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useRouter } from 'expo-router';
 import {
@@ -66,7 +58,7 @@ export default function BooksScreen() {
     if (editing) {
       updateBook.mutate(
         { id: editing.id, input: { name: name.trim(), icon } },
-        { onSuccess: () => setModalVisible(false) },
+        { onSuccess: () => setModalVisible(false) }
       );
     } else {
       createBook.mutate(input, { onSuccess: () => setModalVisible(false) });
@@ -93,20 +85,20 @@ export default function BooksScreen() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-canvas">
       <View className="bg-white px-4 pt-14 pb-4 border-b border-gray-100 flex-row items-center justify-between">
         <TouchableOpacity onPress={() => router.back()}>
-          <Text className="text-indigo-500 text-base">← 返回</Text>
+          <Text className="text-primary text-base">← 返回</Text>
         </TouchableOpacity>
         <Text className="text-lg font-bold text-gray-900">账本管理</Text>
         <TouchableOpacity onPress={openAddModal}>
-          <Text className="text-indigo-500 text-base">添加</Text>
+          <Text className="text-primary text-base">添加</Text>
         </TouchableOpacity>
       </View>
 
       <FlatList
         data={books}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: 16, gap: 12 }}
         renderItem={({ item }) => {
           const isActive = item.id === currentBookId;
@@ -122,9 +114,7 @@ export default function BooksScreen() {
                 <Text className="text-2xl">{item.icon}</Text>
                 <View>
                   <Text className="font-medium text-gray-900">{item.name}</Text>
-                  {isActive && (
-                    <Text className="text-xs text-indigo-500">当前使用</Text>
-                  )}
+                  {isActive && <Text className="text-xs text-primary">当前使用</Text>}
                 </View>
               </View>
               <View className="flex-row items-center gap-2">
@@ -177,7 +167,7 @@ export default function BooksScreen() {
                 <Text className="text-gray-700 font-medium">取消</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="flex-1 py-3 rounded-lg bg-indigo-500 items-center"
+                className="flex-1 py-3 rounded-lg bg-primary items-center"
                 onPress={handleSave}
               >
                 <Text className="text-white font-medium">保存</Text>

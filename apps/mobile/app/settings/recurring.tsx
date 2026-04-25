@@ -56,8 +56,8 @@ export default function RecurringScreen() {
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
   const [endDate, setEndDate] = useState('');
 
-  const filteredCategories = categories.filter(c => c.type === type || c.type === 'both');
-  const categoryMap = Object.fromEntries(categories.map(c => [c.id, c]));
+  const filteredCategories = categories.filter((c) => c.type === type || c.type === 'both');
+  const categoryMap = Object.fromEntries(categories.map((c) => [c.id, c]));
 
   const openAddModal = () => {
     setEditing(null);
@@ -113,7 +113,7 @@ export default function RecurringScreen() {
     if (editing) {
       updateRecurring.mutate(
         { id: editing.id, input },
-        { onSuccess: () => setModalVisible(false) },
+        { onSuccess: () => setModalVisible(false) }
       );
     } else {
       createRecurring.mutate(input, { onSuccess: () => setModalVisible(false) });
@@ -137,27 +137,30 @@ export default function RecurringScreen() {
 
   const getFrequencyLabel = (item: RecurringTransaction) => {
     switch (item.frequency) {
-      case 'daily': return '每日';
-      case 'weekly': return `每${DAY_OF_WEEK_LABELS[item.dayOfWeek ?? 0]}`;
-      case 'monthly': return `每月${item.dayOfMonth ?? 1}日`;
+      case 'daily':
+        return '每日';
+      case 'weekly':
+        return `每${DAY_OF_WEEK_LABELS[item.dayOfWeek ?? 0]}`;
+      case 'monthly':
+        return `每月${item.dayOfMonth ?? 1}日`;
     }
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-canvas">
       <View className="bg-white px-4 pt-14 pb-4 border-b border-gray-100 flex-row items-center justify-between">
         <TouchableOpacity onPress={() => router.back()}>
-          <Text className="text-indigo-500 text-base">← 返回</Text>
+          <Text className="text-primary text-base">← 返回</Text>
         </TouchableOpacity>
         <Text className="text-lg font-bold text-gray-900">定期记账</Text>
         <TouchableOpacity onPress={openAddModal}>
-          <Text className="text-indigo-500 text-base">添加</Text>
+          <Text className="text-primary text-base">添加</Text>
         </TouchableOpacity>
       </View>
 
       <FlatList
         data={recurring}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: 16, gap: 12 }}
         renderItem={({ item }) => {
           const cat = categoryMap[item.categoryId];
@@ -172,12 +175,12 @@ export default function RecurringScreen() {
                   <Text className="text-xl">{cat?.icon ?? '📦'}</Text>
                   <View>
                     <Text className="font-medium text-gray-900">{cat?.name ?? '未知'}</Text>
-                    {item.note ? (
-                      <Text className="text-xs text-gray-400">{item.note}</Text>
-                    ) : null}
+                    {item.note ? <Text className="text-xs text-gray-400">{item.note}</Text> : null}
                   </View>
                 </View>
-                <Text className={`text-lg font-bold ${item.type === 'expense' ? 'text-expense' : 'text-income'}`}>
+                <Text
+                  className={`text-lg font-bold ${item.type === 'expense' ? 'text-expense' : 'text-income'}`}
+                >
                   {item.type === 'expense' ? '-' : '+'}¥{item.amount.toFixed(2)}
                 </Text>
               </View>
@@ -220,15 +223,29 @@ export default function RecurringScreen() {
             <View className="bg-gray-100 rounded-xl p-1 flex-row mb-4">
               <TouchableOpacity
                 className={`flex-1 py-2 rounded-lg items-center ${type === 'expense' ? 'bg-expense' : ''}`}
-                onPress={() => { setType('expense'); setSelectedCategoryId(null); }}
+                onPress={() => {
+                  setType('expense');
+                  setSelectedCategoryId(null);
+                }}
               >
-                <Text className={`font-medium ${type === 'expense' ? 'text-white' : 'text-gray-600'}`}>支出</Text>
+                <Text
+                  className={`font-medium ${type === 'expense' ? 'text-white' : 'text-gray-600'}`}
+                >
+                  支出
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 className={`flex-1 py-2 rounded-lg items-center ${type === 'income' ? 'bg-income' : ''}`}
-                onPress={() => { setType('income'); setSelectedCategoryId(null); }}
+                onPress={() => {
+                  setType('income');
+                  setSelectedCategoryId(null);
+                }}
               >
-                <Text className={`font-medium ${type === 'income' ? 'text-white' : 'text-gray-600'}`}>收入</Text>
+                <Text
+                  className={`font-medium ${type === 'income' ? 'text-white' : 'text-gray-600'}`}
+                >
+                  收入
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -245,17 +262,19 @@ export default function RecurringScreen() {
             {/* Category */}
             <Text className="text-sm text-gray-500 mb-2">分类</Text>
             <View className="flex-row flex-wrap gap-2 mb-4">
-              {filteredCategories.map(cat => (
+              {filteredCategories.map((cat) => (
                 <TouchableOpacity
                   key={cat.id}
                   className={`px-3 py-2 rounded-lg ${
-                    selectedCategoryId === cat.id ? 'bg-indigo-500' : 'bg-gray-100'
+                    selectedCategoryId === cat.id ? 'bg-primary' : 'bg-gray-100'
                   }`}
                   onPress={() => setSelectedCategoryId(cat.id)}
                 >
-                  <Text className={`text-sm ${
-                    selectedCategoryId === cat.id ? 'text-white' : 'text-gray-700'
-                  }`}>
+                  <Text
+                    className={`text-sm ${
+                      selectedCategoryId === cat.id ? 'text-white' : 'text-gray-700'
+                    }`}
+                  >
                     {cat.icon} {cat.name}
                   </Text>
                 </TouchableOpacity>
@@ -274,17 +293,19 @@ export default function RecurringScreen() {
             {/* Frequency */}
             <Text className="text-sm text-gray-500 mb-2">频率</Text>
             <View className="flex-row gap-2 mb-3">
-              {(['daily', 'weekly', 'monthly'] as RecurringFrequency[]).map(f => (
+              {(['daily', 'weekly', 'monthly'] as RecurringFrequency[]).map((f) => (
                 <TouchableOpacity
                   key={f}
                   className={`flex-1 py-2 rounded-lg items-center ${
-                    frequency === f ? 'bg-indigo-500' : 'bg-gray-100'
+                    frequency === f ? 'bg-primary' : 'bg-gray-100'
                   }`}
                   onPress={() => setFrequency(f)}
                 >
-                  <Text className={`text-sm font-medium ${
-                    frequency === f ? 'text-white' : 'text-gray-700'
-                  }`}>
+                  <Text
+                    className={`text-sm font-medium ${
+                      frequency === f ? 'text-white' : 'text-gray-700'
+                    }`}
+                  >
                     {FREQUENCY_LABELS[f]}
                   </Text>
                 </TouchableOpacity>
@@ -300,13 +321,15 @@ export default function RecurringScreen() {
                     <TouchableOpacity
                       key={i}
                       className={`px-3 py-2 rounded-lg ${
-                        dayOfWeek === i ? 'bg-indigo-500' : 'bg-gray-100'
+                        dayOfWeek === i ? 'bg-primary' : 'bg-gray-100'
                       }`}
                       onPress={() => setDayOfWeek(i)}
                     >
-                      <Text className={`text-sm ${
-                        dayOfWeek === i ? 'text-white' : 'text-gray-700'
-                      }`}>{label}</Text>
+                      <Text
+                        className={`text-sm ${dayOfWeek === i ? 'text-white' : 'text-gray-700'}`}
+                      >
+                        {label}
+                      </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -320,7 +343,7 @@ export default function RecurringScreen() {
                 <TextInput
                   className="bg-gray-100 rounded-lg px-4 py-3 mb-3 text-base"
                   value={dayOfMonth.toString()}
-                  onChangeText={v => {
+                  onChangeText={(v) => {
                     const n = parseInt(v, 10);
                     if (!isNaN(n) && n >= 1 && n <= 31) setDayOfMonth(n);
                   }}
@@ -356,7 +379,7 @@ export default function RecurringScreen() {
                 <Text className="text-gray-700 font-medium">取消</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="flex-1 py-3 rounded-lg bg-indigo-500 items-center"
+                className="flex-1 py-3 rounded-lg bg-primary items-center"
                 onPress={handleSave}
               >
                 <Text className="text-white font-medium">保存</Text>

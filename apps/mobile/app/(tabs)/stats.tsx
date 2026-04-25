@@ -4,8 +4,12 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { CartesianChart, Bar, Pie, PolarChart } from 'victory-native';
 import { useFont } from '@shopify/react-native-skia';
 import {
-  SqliteTransactionRepository, SqliteCategoryRepository,
-  useMonthlyStats, useCategoryBreakdown, useMonthlyTrend, useCategories,
+  SqliteTransactionRepository,
+  SqliteCategoryRepository,
+  useMonthlyStats,
+  useCategoryBreakdown,
+  useMonthlyTrend,
+  useCategories,
 } from '@moneybook/core';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -27,42 +31,46 @@ export default function StatsScreen() {
 
   const { data: monthlyStats } = useMonthlyStats(transactionRepo, selectedYear, selectedMonth);
   const { data: breakdown = [] } = useCategoryBreakdown(
-    transactionRepo, categoryRepo, selectedYear, selectedMonth, breakdownType
+    transactionRepo,
+    categoryRepo,
+    selectedYear,
+    selectedMonth,
+    breakdownType
   );
   const { data: trend = [] } = useMonthlyTrend(transactionRepo, 6);
 
   const goToPrevMonth = () => {
     if (selectedMonth === 1) {
-      setSelectedYear(y => y - 1);
+      setSelectedYear((y) => y - 1);
       setSelectedMonth(12);
     } else {
-      setSelectedMonth(m => m - 1);
+      setSelectedMonth((m) => m - 1);
     }
   };
 
   const goToNextMonth = () => {
     if (selectedMonth === 12) {
-      setSelectedYear(y => y + 1);
+      setSelectedYear((y) => y + 1);
       setSelectedMonth(1);
     } else {
-      setSelectedMonth(m => m + 1);
+      setSelectedMonth((m) => m + 1);
     }
   };
 
-  const pieData = breakdown.map(b => ({
+  const pieData = breakdown.map((b) => ({
     value: b.amount,
     color: b.color,
     label: b.categoryName,
   }));
 
-  const barData = trend.map(t => ({
+  const barData = trend.map((t) => ({
     month: t.label,
     income: t.income,
     expense: t.expense,
   }));
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
+    <ScrollView className="flex-1 bg-canvas">
       <View className="bg-white px-4 pt-14 pb-4 border-b border-gray-100">
         <Text className="text-2xl font-bold text-gray-900">统计</Text>
       </View>
@@ -96,7 +104,9 @@ export default function StatsScreen() {
         </View>
         <View className="flex-1 bg-white rounded-xl p-3 items-center">
           <Text className="text-xs text-gray-500 mb-1">结余</Text>
-          <Text className={`text-lg font-bold ${(monthlyStats?.balance ?? 0) >= 0 ? 'text-income' : 'text-expense'}`}>
+          <Text
+            className={`text-lg font-bold ${(monthlyStats?.balance ?? 0) >= 0 ? 'text-income' : 'text-expense'}`}
+          >
             ¥{(monthlyStats?.balance ?? 0).toFixed(2)}
           </Text>
         </View>
@@ -112,13 +122,21 @@ export default function StatsScreen() {
                 className={`px-3 py-1 rounded-md ${breakdownType === 'expense' ? 'bg-expense' : ''}`}
                 onPress={() => setBreakdownType('expense')}
               >
-                <Text className={`text-xs ${breakdownType === 'expense' ? 'text-white' : 'text-gray-600'}`}>支出</Text>
+                <Text
+                  className={`text-xs ${breakdownType === 'expense' ? 'text-white' : 'text-gray-600'}`}
+                >
+                  支出
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 className={`px-3 py-1 rounded-md ${breakdownType === 'income' ? 'bg-income' : ''}`}
                 onPress={() => setBreakdownType('income')}
               >
-                <Text className={`text-xs ${breakdownType === 'income' ? 'text-white' : 'text-gray-600'}`}>收入</Text>
+                <Text
+                  className={`text-xs ${breakdownType === 'income' ? 'text-white' : 'text-gray-600'}`}
+                >
+                  收入
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -126,26 +144,27 @@ export default function StatsScreen() {
           {pieData.length > 0 ? (
             <>
               <View style={{ height: 200 }}>
-                <PolarChart
-                  data={pieData}
-                  labelKey="label"
-                  valueKey="value"
-                  colorKey="color"
-                >
+                <PolarChart data={pieData} labelKey="label" valueKey="value" colorKey="color">
                   <Pie.Chart />
                 </PolarChart>
               </View>
 
               {/* Legend */}
               <View className="mt-3 gap-2">
-                {breakdown.map(b => (
+                {breakdown.map((b) => (
                   <View key={b.categoryId} className="flex-row items-center justify-between">
                     <View className="flex-row items-center gap-2">
-                      <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: b.color }} />
-                      <Text className="text-sm text-gray-700">{b.categoryIcon} {b.categoryName}</Text>
+                      <View
+                        style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: b.color }}
+                      />
+                      <Text className="text-sm text-gray-700">
+                        {b.categoryIcon} {b.categoryName}
+                      </Text>
                     </View>
                     <View className="flex-row items-center gap-2">
-                      <Text className="text-sm font-medium text-gray-900">¥{b.amount.toFixed(2)}</Text>
+                      <Text className="text-sm font-medium text-gray-900">
+                        ¥{b.amount.toFixed(2)}
+                      </Text>
                       <Text className="text-xs text-gray-500">{b.percentage}%</Text>
                     </View>
                   </View>
@@ -165,7 +184,7 @@ export default function StatsScreen() {
         <View className="bg-white rounded-xl p-4">
           <Text className="font-bold text-gray-900 mb-3">近6个月趋势</Text>
 
-          {barData.some(d => d.income > 0 || d.expense > 0) ? (
+          {barData.some((d) => d.income > 0 || d.expense > 0) ? (
             <View style={{ height: 220 }}>
               <CartesianChart
                 data={barData}
@@ -204,11 +223,15 @@ export default function StatsScreen() {
           {/* Legend */}
           <View className="flex-row justify-center gap-6 mt-2">
             <View className="flex-row items-center gap-1">
-              <View style={{ width: 12, height: 12, borderRadius: 2, backgroundColor: '#22c55e' }} />
+              <View
+                style={{ width: 12, height: 12, borderRadius: 2, backgroundColor: '#22c55e' }}
+              />
               <Text className="text-xs text-gray-500">收入</Text>
             </View>
             <View className="flex-row items-center gap-1">
-              <View style={{ width: 12, height: 12, borderRadius: 2, backgroundColor: '#ef4444' }} />
+              <View
+                style={{ width: 12, height: 12, borderRadius: 2, backgroundColor: '#ef4444' }}
+              />
               <Text className="text-xs text-gray-500">支出</Text>
             </View>
           </View>

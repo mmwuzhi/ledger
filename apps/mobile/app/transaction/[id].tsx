@@ -3,8 +3,13 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Image } fro
 import { useSQLiteContext } from 'expo-sqlite';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-  SqliteTransactionRepository, SqliteCategoryRepository, SqliteReceiptRepository,
-  useTransaction, useUpdateTransaction, useCategories, useReceipt,
+  SqliteTransactionRepository,
+  SqliteCategoryRepository,
+  SqliteReceiptRepository,
+  useTransaction,
+  useUpdateTransaction,
+  useCategories,
+  useReceipt,
   UpdateTransactionInput,
 } from '@moneybook/core';
 
@@ -37,7 +42,7 @@ export default function EditTransactionScreen() {
     }
   }, [transaction]);
 
-  const filteredCategories = categories.filter(c => c.type === type || c.type === 'both');
+  const filteredCategories = categories.filter((c) => c.type === type || c.type === 'both');
 
   const handleSubmit = async () => {
     if (!amount || isNaN(parseFloat(amount))) {
@@ -68,7 +73,7 @@ export default function EditTransactionScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
+    <ScrollView className="flex-1 bg-canvas">
       <View className="bg-white px-4 pt-14 pb-4 border-b border-gray-100 flex-row items-center gap-3">
         <TouchableOpacity onPress={() => router.back()}>
           <Text className="text-primary text-lg">←</Text>
@@ -83,13 +88,17 @@ export default function EditTransactionScreen() {
             className={`flex-1 py-2 rounded-lg items-center ${type === 'expense' ? 'bg-expense' : ''}`}
             onPress={() => setType('expense')}
           >
-            <Text className={`font-medium ${type === 'expense' ? 'text-white' : 'text-gray-600'}`}>支出</Text>
+            <Text className={`font-medium ${type === 'expense' ? 'text-white' : 'text-gray-600'}`}>
+              支出
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             className={`flex-1 py-2 rounded-lg items-center ${type === 'income' ? 'bg-income' : ''}`}
             onPress={() => setType('income')}
           >
-            <Text className={`font-medium ${type === 'income' ? 'text-white' : 'text-gray-600'}`}>收入</Text>
+            <Text className={`font-medium ${type === 'income' ? 'text-white' : 'text-gray-600'}`}>
+              收入
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -97,9 +106,15 @@ export default function EditTransactionScreen() {
         {receipt?.imageUri ? (
           <View className="bg-white rounded-xl p-4">
             <Text className="font-medium text-gray-700 mb-2">小票</Text>
-            <Image source={{ uri: receipt.imageUri }} className="w-full h-48 rounded-lg" resizeMode="contain" />
+            <Image
+              source={{ uri: receipt.imageUri }}
+              className="w-full h-48 rounded-lg"
+              resizeMode="contain"
+            />
             {receipt.ocrResult?.rawText ? (
-              <Text className="text-xs text-gray-400 mt-2">识别文本: {receipt.ocrResult.rawText.slice(0, 100)}...</Text>
+              <Text className="text-xs text-gray-400 mt-2">
+                识别文本: {receipt.ocrResult.rawText.slice(0, 100)}...
+              </Text>
             ) : null}
           </View>
         ) : null}
@@ -120,14 +135,16 @@ export default function EditTransactionScreen() {
         <View className="bg-white rounded-xl p-4">
           <Text className="font-medium text-gray-700 mb-3">分类</Text>
           <View className="flex-row flex-wrap gap-2">
-            {filteredCategories.map(cat => (
+            {filteredCategories.map((cat) => (
               <TouchableOpacity
                 key={cat.id}
                 className={`px-3 py-2 rounded-lg flex-row items-center gap-1 ${selectedCategoryId === cat.id ? 'bg-primary' : 'bg-gray-100'}`}
                 onPress={() => setSelectedCategoryId(cat.id)}
               >
                 <Text>{cat.icon}</Text>
-                <Text className={selectedCategoryId === cat.id ? 'text-white' : 'text-gray-700'}>{cat.name}</Text>
+                <Text className={selectedCategoryId === cat.id ? 'text-white' : 'text-gray-700'}>
+                  {cat.name}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>

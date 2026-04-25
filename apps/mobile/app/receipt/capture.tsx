@@ -37,7 +37,7 @@ export default function CaptureScreen() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50 p-4">
+    <View className="flex-1 bg-canvas p-4">
       <View className="flex-row items-center gap-3 pt-14 pb-4">
         <TouchableOpacity onPress={() => router.back()}>
           <Text className="text-primary text-lg">←</Text>
@@ -63,10 +63,16 @@ export default function CaptureScreen() {
       )}
 
       <View className="flex-row gap-3 mt-4">
-        <TouchableOpacity className="flex-1 bg-white rounded-xl py-4 items-center" onPress={() => handleCapture(true)}>
+        <TouchableOpacity
+          className="flex-1 bg-white rounded-xl py-4 items-center"
+          onPress={() => handleCapture(true)}
+        >
           <Text>📷 拍照</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="flex-1 bg-white rounded-xl py-4 items-center" onPress={() => handleCapture(false)}>
+        <TouchableOpacity
+          className="flex-1 bg-white rounded-xl py-4 items-center"
+          onPress={() => handleCapture(false)}
+        >
           <Text>🖼️ 相册</Text>
         </TouchableOpacity>
       </View>
