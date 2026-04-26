@@ -1,4 +1,4 @@
-import type { SQLiteDatabase } from 'expo-sqlite';
+import { IDatabase } from '../db/adapter';
 import { randomUUID } from 'expo-crypto';
 import { Book, CreateBookInput, UpdateBookInput } from '../models/book';
 import { IBookRepository } from '../repositories/IBookRepository';
@@ -15,7 +15,7 @@ function rowToBook(row: any): Book {
 }
 
 export class SqliteBookRepository implements IBookRepository {
-  constructor(private readonly db: SQLiteDatabase) {}
+  constructor(private readonly db: IDatabase) {}
 
   async findAll(): Promise<Book[]> {
     const rows = await this.db.getAllAsync(

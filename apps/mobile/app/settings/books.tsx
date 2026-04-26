@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert, TextInput, Modal } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useRouter } from 'expo-router';
 import {
   SqliteBookRepository,
@@ -17,7 +17,7 @@ import {
 
 export default function BooksScreen() {
   const router = useRouter();
-  const db = useSQLiteContext();
+  const db = useDb();
   const bookRepo = new SqliteBookRepository(db);
   const settingsRepo = new SqliteSettingsRepository(db);
 

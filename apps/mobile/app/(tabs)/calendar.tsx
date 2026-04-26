@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, FlatList, ScrollView } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useRouter } from 'expo-router';
 import {
   SqliteTransactionRepository,
@@ -35,7 +35,7 @@ function getMonthGrid(year: number, month: number): (number | null)[][] {
 
 export default function CalendarScreen() {
   const router = useRouter();
-  const db = useSQLiteContext();
+  const db = useDb();
   const transactionRepo = new SqliteTransactionRepository(db);
   const categoryRepo = new SqliteCategoryRepository(db);
 

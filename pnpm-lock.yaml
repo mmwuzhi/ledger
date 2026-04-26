@@ -26,6 +26,9 @@ importers:
       '@moneybook/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@op-engineering/op-sqlite':
+        specifier: ^10.0.0
+        version: 10.1.0(react-native@0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
       '@react-native-ml-kit/text-recognition':
         specifier: ^1.1.0
         version: 1.5.2(react-native@0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
@@ -1387,6 +1390,12 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
+
+  '@op-engineering/op-sqlite@10.1.0':
+    resolution: {integrity: sha512-h72JQ8zK3ULiEp3Tngnl2LNsfMuxpxddhRrt3XYyeoQGeh7vj5B6nQwkpKXR02Hl/EKPmbRsmxue8V7bhXr7ug==}
+    peerDependencies:
+      react: '*'
+      react-native: '>0.73.0'
 
   '@open-draft/deferred-promise@2.2.0':
     resolution: {integrity: sha512-CecwLWx3rhxVQF6V4bAgPS5t+So2sTbPgAzafKkVizyi7tlwpcFpdFqq+wqF2OwNBmqFuu6tOyouTuxgpMfzmA==}
@@ -7642,6 +7651,11 @@ snapshots:
       fastq: 1.20.1
 
   '@nolyfill/is-core-module@1.0.39': {}
+
+  '@op-engineering/op-sqlite@10.1.0(react-native@0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)':
+    dependencies:
+      react: 19.2.0
+      react-native: 0.83.4(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0)
 
   '@open-draft/deferred-promise@2.2.0': {}
 

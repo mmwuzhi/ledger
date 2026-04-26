@@ -1,4 +1,4 @@
-import { SQLiteDatabase } from 'expo-sqlite';
+import { IDatabase } from '../db/adapter';
 import { randomUUID } from 'expo-crypto';
 import {
   Transaction,
@@ -31,7 +31,7 @@ function rowToTransaction(row: Record<string, unknown>): Transaction {
 }
 
 export class SqliteTransactionRepository implements ITransactionRepository {
-  constructor(private readonly db: SQLiteDatabase) {}
+  constructor(private readonly db: IDatabase) {}
 
   async findAll(options?: { includeDeleted?: boolean }): Promise<Transaction[]> {
     const whereClause = options?.includeDeleted ? '' : 'WHERE deleted_at IS NULL';

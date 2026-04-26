@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, TextInput, Modal, FlatList } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useRouter } from 'expo-router';
 import {
   SqliteQuickTemplateRepository,
@@ -17,7 +17,7 @@ import {
 
 export default function QuickAddScreen() {
   const router = useRouter();
-  const db = useSQLiteContext();
+  const db = useDb();
   const templateRepo = new SqliteQuickTemplateRepository(db);
   const categoryRepo = new SqliteCategoryRepository(db);
 

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert, TextInput } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useRouter } from 'expo-router';
 import {
   SqliteTransactionRepository,
@@ -19,7 +19,7 @@ import {
 } from '@moneybook/core';
 
 function useDependencies() {
-  const db = useSQLiteContext();
+  const db = useDb();
   const transactionRepo = new SqliteTransactionRepository(db);
   const categoryRepo = new SqliteCategoryRepository(db);
   const receiptRepo = new SqliteReceiptRepository(db);

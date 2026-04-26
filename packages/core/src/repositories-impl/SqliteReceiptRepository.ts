@@ -1,4 +1,4 @@
-import { SQLiteDatabase } from 'expo-sqlite';
+import { IDatabase } from '../db/adapter';
 import { randomUUID } from 'expo-crypto';
 import { Receipt, OcrResult, CreateReceiptInput } from '../models';
 import { IReceiptRepository } from '../repositories';
@@ -19,7 +19,7 @@ function rowToReceipt(row: Record<string, unknown>): Receipt {
 }
 
 export class SqliteReceiptRepository implements IReceiptRepository {
-  constructor(private readonly db: SQLiteDatabase) {}
+  constructor(private readonly db: IDatabase) {}
 
   async findById(id: string): Promise<Receipt | null> {
     const row = await this.db.getFirstAsync<Record<string, unknown>>(

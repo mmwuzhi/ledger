@@ -1,4 +1,4 @@
-import { SQLiteDatabase } from 'expo-sqlite';
+import { IDatabase } from '../db/adapter';
 import { randomUUID } from 'expo-crypto';
 import { Category, CreateCategoryInput, UpdateCategoryInput } from '../models';
 import { ICategoryRepository } from '../repositories';
@@ -20,7 +20,7 @@ function rowToCategory(row: Record<string, unknown>): Category {
 }
 
 export class SqliteCategoryRepository implements ICategoryRepository {
-  constructor(private readonly db: SQLiteDatabase) {}
+  constructor(private readonly db: IDatabase) {}
 
   async findAll(options?: { includeDeleted?: boolean }): Promise<Category[]> {
     const whereClause = options?.includeDeleted ? '' : 'WHERE deleted_at IS NULL';

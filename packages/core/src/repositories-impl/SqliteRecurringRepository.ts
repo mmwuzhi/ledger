@@ -1,4 +1,4 @@
-import { SQLiteDatabase } from 'expo-sqlite';
+import { IDatabase } from '../db/adapter';
 import { randomUUID } from 'expo-crypto';
 import {
   RecurringTransaction,
@@ -32,7 +32,7 @@ function rowToRecurring(row: Record<string, unknown>): RecurringTransaction {
 }
 
 export class SqliteRecurringRepository implements IRecurringRepository {
-  constructor(private readonly db: SQLiteDatabase) {}
+  constructor(private readonly db: IDatabase) {}
 
   async findAll(options?: { includeDeleted?: boolean }): Promise<RecurringTransaction[]> {
     const whereClause = options?.includeDeleted ? '' : 'WHERE deleted_at IS NULL';

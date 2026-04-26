@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useRouter } from 'expo-router';
 import { SqliteSettingsRepository, useSettings, useUpdateSettings } from '@moneybook/core';
 
@@ -10,7 +10,7 @@ const TYPE_OPTIONS: { value: 'expense' | 'income'; label: string; icon: string }
 
 export default function DefaultTypeScreen() {
   const router = useRouter();
-  const db = useSQLiteContext();
+  const db = useDb();
   const settingsRepo = new SqliteSettingsRepository(db);
   const { data: settings } = useSettings(settingsRepo);
   const updateSettings = useUpdateSettings(settingsRepo);

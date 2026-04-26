@@ -1,9 +1,9 @@
-import { SQLiteDatabase } from 'expo-sqlite';
+import { IDatabase } from '../db/adapter';
 import { Settings, SettingsSchema } from '../models/settings';
 import { ISettingsRepository } from '../repositories/ISettingsRepository';
 
 export class SqliteSettingsRepository implements ISettingsRepository {
-  constructor(private readonly db: SQLiteDatabase) {}
+  constructor(private readonly db: IDatabase) {}
 
   async get(): Promise<Settings> {
     const rows = await this.db.getAllAsync<{ key: string; value: string }>(

@@ -18,6 +18,7 @@ export * from './hooks/useTags';
 export * from './hooks/useQuickTemplates';
 export * from './db/schema';
 export * from './db/migrations';
+export type { IDatabase } from './db/adapter';
 export { SqliteTransactionRepository } from './repositories-impl/SqliteTransactionRepository';
 export { SqliteCategoryRepository } from './repositories-impl/SqliteCategoryRepository';
 export { SqliteReceiptRepository } from './repositories-impl/SqliteReceiptRepository';

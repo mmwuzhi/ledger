@@ -9,7 +9,7 @@ import {
   Modal,
   Switch,
 } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useRouter } from 'expo-router';
 import {
   SqliteRecurringRepository,
@@ -34,7 +34,7 @@ const DAY_OF_WEEK_LABELS = ['周日', '周一', '周二', '周三', '周四', '�
 
 export default function RecurringScreen() {
   const router = useRouter();
-  const db = useSQLiteContext();
+  const db = useDb();
   const recurringRepo = new SqliteRecurringRepository(db);
   const categoryRepo = new SqliteCategoryRepository(db);
 

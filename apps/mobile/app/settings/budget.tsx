@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert, TextInput, Modal } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useRouter } from 'expo-router';
 import {
   SqliteBudgetRepository,
@@ -18,7 +18,7 @@ import {
 
 export default function BudgetScreen() {
   const router = useRouter();
-  const db = useSQLiteContext();
+  const db = useDb();
   const budgetRepo = new SqliteBudgetRepository(db);
   const transactionRepo = new SqliteTransactionRepository(db);
   const categoryRepo = new SqliteCategoryRepository(db);

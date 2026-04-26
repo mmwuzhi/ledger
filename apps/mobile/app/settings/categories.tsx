@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert, TextInput, Modal } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useRouter } from 'expo-router';
 import {
   SqliteCategoryRepository,
@@ -15,7 +15,7 @@ type CategoryType = 'income' | 'expense' | 'both';
 
 export default function CategoriesScreen() {
   const router = useRouter();
-  const db = useSQLiteContext();
+  const db = useDb();
   const categoryRepo = new SqliteCategoryRepository(db);
   const { data: categories = [], isLoading } = useCategories(categoryRepo);
   const createCategory = useCreateCategory(categoryRepo);

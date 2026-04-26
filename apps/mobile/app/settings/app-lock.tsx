@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, Switch, TextInput } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useRouter } from 'expo-router';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
@@ -10,7 +10,7 @@ const PIN_KEY = 'moneybook_pin';
 
 export default function AppLockScreen() {
   const router = useRouter();
-  const db = useSQLiteContext();
+  const db = useDb();
   const settingsRepo = new SqliteSettingsRepository(db);
   const { data: settings } = useSettings(settingsRepo);
   const updateSettings = useUpdateSettings(settingsRepo);

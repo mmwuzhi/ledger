@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   SqliteTransactionRepository,
@@ -16,7 +16,7 @@ import {
 export default function EditTransactionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const db = useSQLiteContext();
+  const db = useDb();
   const transactionRepo = new SqliteTransactionRepository(db);
   const categoryRepo = new SqliteCategoryRepository(db);
   const receiptRepo = new SqliteReceiptRepository(db);

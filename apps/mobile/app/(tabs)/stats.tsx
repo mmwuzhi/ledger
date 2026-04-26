@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { CartesianChart, Bar, Pie, PolarChart } from 'victory-native';
 import { useFont } from '@shopify/react-native-skia';
 import {
@@ -15,7 +15,7 @@ import {
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 function useDependencies() {
-  const db = useSQLiteContext();
+  const db = useDb();
   return {
     transactionRepo: new SqliteTransactionRepository(db),
     categoryRepo: new SqliteCategoryRepository(db),

@@ -1,4 +1,4 @@
-import { SQLiteDatabase } from 'expo-sqlite';
+import { IDatabase } from '../db/adapter';
 import { randomUUID } from 'expo-crypto';
 import {
   QuickTemplate,
@@ -27,7 +27,7 @@ function rowToTemplate(row: Record<string, unknown>): QuickTemplate {
 }
 
 export class SqliteQuickTemplateRepository implements IQuickTemplateRepository {
-  constructor(private readonly db: SQLiteDatabase) {}
+  constructor(private readonly db: IDatabase) {}
 
   async findAll(): Promise<QuickTemplate[]> {
     const rows = await this.db.getAllAsync<Record<string, unknown>>(

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import TextRecognition from '@react-native-ml-kit/text-recognition';
@@ -33,7 +33,7 @@ const ocrService = new OcrService({
 
 export default function AddScreen() {
   const router = useRouter();
-  const db = useSQLiteContext();
+  const db = useDb();
   const transactionRepo = new SqliteTransactionRepository(db);
   const categoryRepo = new SqliteCategoryRepository(db);
   const receiptRepo = new SqliteReceiptRepository(db);

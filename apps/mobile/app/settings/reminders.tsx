@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Switch, Alert, Platform, TextInput } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useRouter } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { SqliteSettingsRepository, useSettings, useUpdateSettings } from '@moneybook/core';
@@ -15,7 +15,7 @@ Notifications.setNotificationHandler({
 
 export default function RemindersScreen() {
   const router = useRouter();
-  const db = useSQLiteContext();
+  const db = useDb();
   const settingsRepo = new SqliteSettingsRepository(db);
   const { data: settings } = useSettings(settingsRepo);
   const updateSettings = useUpdateSettings(settingsRepo);

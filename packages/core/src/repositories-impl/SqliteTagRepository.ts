@@ -1,4 +1,4 @@
-import type { SQLiteDatabase } from 'expo-sqlite';
+import { IDatabase } from '../db/adapter';
 import { randomUUID } from 'expo-crypto';
 import { Tag, CreateTagInput, UpdateTagInput } from '../models/tag';
 import { ITagRepository } from '../repositories/ITagRepository';
@@ -15,7 +15,7 @@ function rowToTag(row: any): Tag {
 }
 
 export class SqliteTagRepository implements ITagRepository {
-  constructor(private readonly db: SQLiteDatabase) {}
+  constructor(private readonly db: IDatabase) {}
 
   async findAll(): Promise<Tag[]> {
     const rows = await this.db.getAllAsync(

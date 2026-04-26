@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, Share, ActivityIndicator } from 'react-native';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useDb } from '../../lib/db';
 import { useRouter } from 'expo-router';
 import * as FileSystem from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
@@ -21,7 +21,7 @@ import {
 
 export default function BackupScreen() {
   const router = useRouter();
-  const db = useSQLiteContext();
+  const db = useDb();
   const queryClient = useQueryClient();
   const transactionRepo = new SqliteTransactionRepository(db);
   const categoryRepo = new SqliteCategoryRepository(db);

@@ -1,4 +1,4 @@
-import { SQLiteDatabase } from 'expo-sqlite';
+import { IDatabase } from '../db/adapter';
 import { randomUUID } from 'expo-crypto';
 import { Budget, CreateBudgetInput, UpdateBudgetInput } from '../models/budget';
 import { IBudgetRepository } from '../repositories/IBudgetRepository';
@@ -20,7 +20,7 @@ function rowToBudget(row: Record<string, unknown>): Budget {
 }
 
 export class SqliteBudgetRepository implements IBudgetRepository {
-  constructor(private readonly db: SQLiteDatabase) {}
+  constructor(private readonly db: IDatabase) {}
 
   async findByMonth(year: number, month: number): Promise<Budget[]> {
     const rows = await this.db.getAllAsync<Record<string, unknown>>(
