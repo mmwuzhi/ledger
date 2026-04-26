@@ -1,6 +1,7 @@
 // Extends app.json with environment-specific values.
-// Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in your shell (or .env) before
-// running `expo run:ios` / `eas build`.
+// Reads from .env (gitignored) for local dev; use EAS secrets for CI builds.
+require('dotenv').config();
+
 /** @type {(ctx: { config: import('@expo/config-types').ExpoConfig }) => import('@expo/config-types').ExpoConfig} */
 module.exports = ({ config }) => ({
   ...config,
