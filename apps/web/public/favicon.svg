@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!--
+    Adaptive SVG favicon — Ledger H at 32×32.
+    Light mode : TERRA bg (#b5693a) + CANVAS marks (#f5f0e8)
+    Dark mode  : transparent bg  + TERRA marks (#b5693a)
+
+    ═══ H geometry scaled to 32×32 ═══
+    Available x: 4→28 (24 px wide, 4 px margins)
+    header : x=4  y=6   w=24  h=3   rx=1
+    entry1 : x=4  y=11  w=18  h=3   rx=1   (530/694 × 24 ≈ 18)
+    entry2 : x=4  y=16  w=13  h=3   rx=1   (380/694 × 24 ≈ 13)
+    entry3 : x=4  y=21  h=3   w=16  rx=1   (460/694 × 24 ≈ 16)
+    total  : x=4  y=26  w=23  h=3   rx=1   (680/694 × 24 ≈ 23)
+
+    Gaps between rows ≈ 2 px — visible at browser favicon scale.
+  -->
+  <style>
+    .bg   { fill: #b5693a; }
+    .hd   { fill: #f5f0e8; }        /* header + total */
+    .en   { fill: #f5f0e8; opacity: 0.75; }  /* entries — slightly softer */
+    @media (prefers-color-scheme: dark) {
+      .bg   { fill: transparent; }
+      .hd   { fill: #b5693a; }
+      .en   { fill: #b5693a; opacity: 0.65; }
+    }
+  </style>
+
+  <rect class="bg" width="32" height="32" rx="6"/>
+
+  <!-- Header -->
+  <rect class="hd" x="4" y="6"  width="24" height="3" rx="1"/>
+  <!-- Entries -->
+  <rect class="en" x="4" y="11" width="18" height="3" rx="1"/>
+  <rect class="en" x="4" y="16" width="13" height="3" rx="1"/>
+  <rect class="en" x="4" y="21" width="16" height="3" rx="1"/>
+  <!-- Total -->
+  <rect class="hd" x="4" y="26" width="23" height="3" rx="1"/>
+</svg>

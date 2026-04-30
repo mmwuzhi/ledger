@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!--
+    Ledger H — receipt / financial record.
+    Concept: header bar (TERRA) + 3 entry rows (mid) + total bar (TERRA).
+    This is the structural skeleton of every financial document:
+    title → entries → total. Universal, immediately readable.
+
+    ═══ Layout ═══
+    header  y=204  h=84   rx=24   TERRA #b5693a  w=694 (full available)
+    gap     56 px
+    entry1  y=344  h=76   rx=22   mid   #cc7f52  w=530
+    gap     64 px
+    entry2  y=484  h=76   rx=22   mid             w=380
+    gap     64 px
+    entry3  y=624  h=76   rx=22   mid             w=460
+    gap     56 px
+    total   y=756  h=84   rx=24   TERRA            w=680
+
+    Total span : 756+84−204 = 636   centre y = 204+318 = 522 ≈ 512
+    (slight offset to give header/total more visual weight at top — intentional)
+
+    ═══ Gap rationale ═══
+    Entry-to-entry gap 64 px → at 60 px display ≈ 3.75 px — clearly visible
+    Header/total outer gap 56 px → breathing room before/after the title rows
+
+    ═══ Colour logic ═══
+    TERRA on CANVAS = prominent marks (header + total = the key data)
+    mid on CANVAS   = subordinate (entries = supporting detail)
+    Eye path: header → total → entries.  Exactly right for bookkeeping.
+  -->
+  <rect width="1024" height="1024" fill="#f5f0e8"/>
+
+  <!-- Header -->
+  <rect x="165" y="204" width="694" height="84" rx="24" fill="#b5693a"/>
+
+  <!-- Entry rows -->
+  <rect x="165" y="344" width="530" height="76" rx="22" fill="#cc7f52"/>
+  <rect x="165" y="484" width="380" height="76" rx="22" fill="#cc7f52"/>
+  <rect x="165" y="624" width="460" height="76" rx="22" fill="#cc7f52"/>
+
+  <!-- Total bar -->
+  <rect x="165" y="756" width="680" height="84" rx="24" fill="#b5693a"/>
+</svg>

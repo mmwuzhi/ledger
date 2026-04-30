@@ -17,15 +17,27 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#f5f0e8"
       },
       "package": "com.moneybook.app"
     },
     "plugins": [
       "expo-router",
       "expo-sqlite",
-      ["expo-camera", { "cameraPermission": "允许 MoneyBook 使用相机拍摄小票" }],
-      ["expo-image-picker", { "photosPermission": "允许 MoneyBook 访问相册选择小票图片" }]
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "允许 MoneyBook 使用相机拍摄小票"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "允许 MoneyBook 访问相册选择小票图片"
+        }
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
