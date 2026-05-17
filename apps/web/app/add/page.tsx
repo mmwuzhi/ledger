@@ -256,13 +256,6 @@ export default function AddPage() {
       className="flex flex-col min-h-screen"
       style={{ maxWidth: 640, margin: '0 auto' }}
     >
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
-        .no-spinner::-webkit-inner-spin-button,
-        .no-spinner::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        .no-spinner { -moz-appearance: textfield; }
-      `}</style>
-
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-5 pt-12 pb-4">
         <button
