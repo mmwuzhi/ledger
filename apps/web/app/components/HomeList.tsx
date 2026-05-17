@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import type { Transaction, Category } from '@moneybook/core';
+import { EmptyState } from './EmptyState';
 import { getBool, SETTINGS_KEYS } from '@/lib/settings';
 import { apiBase } from '@/lib/api';
 
@@ -92,6 +93,27 @@ function getCatBreakdown(items: EnrichedTransaction[], totalExpense: number) {
   return { topCats: [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5), totalExpense };
 }
 
+function computeDailyExpense(
+  items: EnrichedTransaction[],
+  dateFrom: string,
+): { day: number; amount: number }[] {
+  const [y, m] = dateFrom.split('-').map(Number);
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const todayDay = new Date().getDate();
+  const cutoff = Math.min(daysInMonth, todayDay);
+  const map = new Map<number, number>();
+  for (const t of items) {
+    if (t.type === 'expense') {
+      const d = parseInt(t.date.slice(8, 10));
+      map.set(d, (map.get(d) ?? 0) + t.amount);
+    }
+  }
+  return Array.from({ length: cutoff }, (_, i) => ({
+    day: i + 1,
+    amount: map.get(i + 1) ?? 0,
+  }));
+}
+
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function Avatar({ size = 32 }: { size?: number }) {
@@ -129,7 +151,12 @@ function Sidebar({
   return (
     <div className="flex flex-col p-5 h-full gap-5">
       <div className="flex items-center gap-2 pt-1">
-        <span className="text-xl">📒</span>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0"    width="18" height="3"   rx="1" fill="#b5693a" />
+          <rect x="0" y="5.5"  width="12" height="2.5" rx="1" fill="#b5693a" />
+          <rect x="0" y="9.5"  width="9"  height="2.5" rx="1" fill="#b5693a" />
+          <rect x="0" y="13.5" width="17" height="3"   rx="1" fill="#b5693a" />
+        </svg>
         <span className="font-semibold text-stone-800 text-base tracking-tight">记账本</span>
       </div>
 
@@ -148,7 +175,7 @@ function Sidebar({
           }}
         >
           {hideIncome
-            ? `${totalExpense > 0 ? '-' : ''}¥${totalExpense.toLocaleString()}`
+            ? `¥${totalExpense.toLocaleString()}`
             : `${net > 0 ? '+' : net < 0 ? '-' : ''}¥${Math.abs(net).toLocaleString()}`}
         </p>
         <div className="flex flex-col gap-2">
@@ -159,7 +186,7 @@ function Sidebar({
                 className="font-bold tabular-nums text-sm"
                 style={{ fontFamily: NUNITO, color: GREEN }}
               >
-                +¥{totalIncome.toLocaleString()}
+                ¥{totalIncome.toLocaleString()}
               </span>
             </div>
           )}
@@ -169,7 +196,7 @@ function Sidebar({
               className="font-bold tabular-nums text-sm"
               style={{ fontFamily: NUNITO, color: RED }}
             >
-              {totalExpense > 0 ? '-' : ''}¥{totalExpense.toLocaleString()}
+              ¥{totalExpense.toLocaleString()}
             </span>
           </div>
         </div>
@@ -232,14 +259,87 @@ function Sidebar({
   );
 }
 
+interface RightPanelProps {
+  enriched: EnrichedTransaction[];
+  dateFrom: string;
+}
+
+function RightPanel({ enriched, dateFrom }: RightPanelProps) {
+  const daily = useMemo(() => computeDailyExpense(enriched, dateFrom), [enriched, dateFrom]);
+  const maxAmount = Math.max(...daily.map((d) => d.amount), 1);
+  const spentDays = daily.filter((d) => d.amount > 0);
+  const avgDaily = spentDays.length > 0
+    ? spentDays.reduce((s, d) => s + d.amount, 0) / spentDays.length
+    : 0;
+  const todayDay = new Date().getDate();
+  const hasData = spentDays.length > 0;
+
+  return (
+    <div
+      className="hidden xl:flex flex-col w-64 flex-shrink-0 sticky top-0 h-screen overflow-y-auto"
+      style={{ background: '#faf8f5', borderLeft: '1px solid #e8e2d8' }}
+    >
+      <div className="p-5 flex flex-col gap-5">
+        <p className="text-xs font-semibold tracking-widest uppercase text-stone-400 pt-1">
+          每日支出
+        </p>
+
+        {!hasData ? (
+          <p className="text-xs text-stone-300">本月暂无支出</p>
+        ) : (
+          <>
+            <div className="flex items-end gap-px" style={{ height: 72 }}>
+              {daily.map(({ day, amount }) => {
+                const isToday = day === todayDay;
+                const h = amount > 0 ? Math.max(3, (amount / maxAmount) * 72) : 2;
+                return (
+                  <div
+                    key={day}
+                    className="flex-1 rounded-sm"
+                    style={{
+                      height: h,
+                      alignSelf: 'flex-end',
+                      background: isToday ? TERRA : amount > 0 ? TERRA : '#e8e2d8',
+                      opacity: isToday ? 1 : amount > 0 ? 0.5 : 0.35,
+                    }}
+                    title={amount > 0 ? `${day}日 ¥${amount.toFixed(0)}` : `${day}日`}
+                  />
+                );
+              })}
+            </div>
+
+            <div className="flex justify-between" style={{ marginTop: -12 }}>
+              <span className="text-stone-300" style={{ fontSize: 10 }}>1日</span>
+              <span className="text-stone-300" style={{ fontSize: 10 }}>{daily.length}日</span>
+            </div>
+
+            {avgDaily > 0 && (
+              <div style={{ borderTop: '1px solid #f0ebe3', paddingTop: 12 }}>
+                <p className="text-xs text-stone-400 mb-1">日均支出</p>
+                <p
+                  className="font-bold tabular-nums"
+                  style={{ fontFamily: NUNITO, fontSize: 15, color: RED, letterSpacing: '-0.015em' }}
+                >
+                  ¥{avgDaily.toFixed(0)}
+                </p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 interface TransactionListProps {
   grouped: Grouped;
   isEmpty: boolean;
   isLoading: boolean;
+  hasSearch: boolean;
   onDelete: (id: string) => void;
 }
 
-function TransactionList({ grouped, isEmpty, isLoading, onDelete }: TransactionListProps) {
+function TransactionList({ grouped, isEmpty, isLoading, hasSearch, onDelete }: TransactionListProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-24 text-stone-300">
@@ -316,12 +416,7 @@ function TransactionList({ grouped, isEmpty, isLoading, onDelete }: TransactionL
           </div>
         );
       })}
-      {isEmpty && !isLoading && (
-        <div className="text-center py-24 text-stone-300">
-          <div className="text-4xl mb-3">📒</div>
-          <p className="text-sm">没有找到相关记录</p>
-        </div>
-      )}
+      {isEmpty && !isLoading && <EmptyState type={hasSearch ? 'no-results' : 'empty'} />}
     </div>
   );
 }
@@ -334,11 +429,14 @@ export default function HomeList() {
   const [search, setSearch] = useState('');
   const [hideIncome, setHideIncome] = useState(false);
 
-  // Read settings from localStorage on mount (and whenever the user navigates back).
-  // localStorage is client-only so useEffect is required here.
+  // Read settings from localStorage on mount and whenever the window regains focus
+  // (e.g. user changes hideIncome on /me and navigates back).
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    setHideIncome(getBool(SETTINGS_KEYS.hideIncome, false));
+    const sync = () => setHideIncome(getBool(SETTINGS_KEYS.hideIncome, false));
+    sync();
+    window.addEventListener('focus', sync);
+    return () => window.removeEventListener('focus', sync);
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -406,8 +504,6 @@ export default function HomeList() {
         WebkitFontSmoothing: 'antialiased',
       }}
     >
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');`}</style>
-
       <div className="flex min-h-screen">
         {/* ── Sidebar (lg+) ── */}
         <div
@@ -461,7 +557,7 @@ export default function HomeList() {
                   }}
                 >
                   {hideIncome
-                    ? `${totalExpense > 0 ? '-' : ''}¥${totalExpense.toLocaleString()}`
+                    ? `¥${totalExpense.toLocaleString()}`
                     : `${net > 0 ? '+' : net < 0 ? '-' : ''}¥${Math.abs(net).toLocaleString()}`}
                 </p>
               </div>
@@ -480,7 +576,7 @@ export default function HomeList() {
                       letterSpacing: '-0.015em',
                     }}
                   >
-                    {totalExpense > 0 ? '-' : ''}¥{totalExpense.toLocaleString()}
+                    ¥{totalExpense.toLocaleString()}
                   </p>
                 </div>
               )}
@@ -515,10 +611,14 @@ export default function HomeList() {
               grouped={grouped}
               isEmpty={filtered.length === 0}
               isLoading={txLoading}
+              hasSearch={!!search}
               onDelete={handleDelete}
             />
           </div>
         </div>
+
+        {/* ── Right panel (xl+) ── */}
+        <RightPanel enriched={enriched} dateFrom={dateFrom} />
       </div>
 
       {/* ── Bottom tab bar (mobile only) ── */}
@@ -531,8 +631,10 @@ export default function HomeList() {
         }}
       >
         <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className="flex-1 flex flex-col items-center justify-center py-3 gap-1 active:scale-95 transition-all"
           style={{ color: TERRA, touchAction: 'manipulation' }}
+          aria-label="账单"
         >
           <svg
             width="22"
